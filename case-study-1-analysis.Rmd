@@ -1,0 +1,46 @@
+---
+title: "MSDS 6306: Live session Unit 05 assignment"
+author:
+  - "Blake Holmes"
+date: "June 8, 2019"
+output: 
+  html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+```{r injest data, echo=TRUE}
+beerData<-read_csv("./Beers.csv")
+breweryData<-read_csv("./Breweries.csv")
+```
+
+```{r 1b, echo=TRUE}
+###b. What are the dimensions of the data?
+
+summary(beerData)
+str(beerData)
+glimpse(beerData)
+summary(beerData)
+
+beerData %>% 
+  summarise_all(funs(sum(is.na(.))))#count the number of NAs or blanks 
+# ABV, IBU, Style have missing values 
+
+beerData %>% 
+    filter(is.na(ABV) |is.na(IBU) | is.na(Style)  ) %>% 
+    View()
+#hmm what should be done about the missing values...
+
+summary(breweryData)
+str(breweryData)
+glimpse(breweryData)
+summary(breweryData)
+
+breweryData %>% 
+  summarise_all(funs(sum(is.na(.))))#count the number of NAs or blanks
+#No blanks 
+
+```
+```
