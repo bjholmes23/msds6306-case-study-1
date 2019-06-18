@@ -63,9 +63,14 @@ breweryData %>%
 
 ```{r merge data, echo=TRUE}
 
-beerData %>%
+beer_brewery<-beerData %>%
   left_join(breweryData, by=c("Brewery_id"="Brew_ID"), suffix = c(".beer", ".brewery")) %>% 
   rename(Beer_name=Name.beer, Brewery_name=Name.brewery)
 
+head(beer_brewery,6)
+
+tail(beer_brewery,6)
+
+#look for duplicated data in character
 
 ```
