@@ -1,7 +1,7 @@
 ---
-title: "MSDS 6306: Live session Unit 05 assignment"
+title: "MSDS 6306: Case 1 "
 author:
-  - "Blake Holmes"
+  - "Blake Holmes and Mel Schwan"
 date: "June 8, 2019"
 output: 
   html_document
@@ -46,6 +46,7 @@ beerData %>%
 beerData %>% 
     filter(is.na(ABV) |is.na(IBU) | is.na(Style)) %>% View()
 #hmm what should be done about the missing values...
+#1.   How many breweries are present in each state?
 
 summary(breweryData)
 str(breweryData)
@@ -53,13 +54,13 @@ glimpse(breweryData)
 summary(breweryData)
 #    Brew_ID          Name               City              State          
 
-
+#Report the number of NA's in each column.
 breweryData %>% 
   summarise_all(funs(sum(is.na(.))))#count the number of NAs or blanks
 #No blanks 
 
 ```
-
+# Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
 
 ```{r merge data, echo=TRUE}
 
@@ -69,3 +70,10 @@ beerData %>%
 
 
 ```
+
+# Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
+
+# Which state has the maximum alcoholic (ABV) beer? 
+# Which state has the most bitter (IBU) beer?
+
+#Summary statistics for the ABV variable.
