@@ -58,7 +58,7 @@ summary(breweryData)
 #Report the number of NA's in each column.
 breweryData %>% 
   summarise_all(funs(sum(is.na(.))))#count the number of NAs or blanks
-#No blanks 
+#No blanks, so it looks like the join is solid. 
 
 ```
 # Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
@@ -77,7 +77,7 @@ head(beer_brewery,6)
 
 tail(beer_brewery,6)
 
-#look for duplicated data in character vectors that we can combine 
+#looking for duplicated data in character vectors that we can combine 
 library(tidystringdist)
 unique(beer_brewery$Beer_name) %>% 
   tidy_comb_all() %>% 
@@ -85,13 +85,13 @@ unique(beer_brewery$Beer_name) %>%
   arrange(osa) %>% 
   View()
 
-unique(beer_brewery$style) %>% 
+unique(beer_brewery$Style) %>% 
   tidy_comb_all() %>% 
   tidy_stringdist() %>% 
   arrange(osa) %>% 
   View()
 
-unique(beer_brewery$Beer_name) %>% 
+unique(beer_brewery$Brewery_name) %>% 
   tidy_comb_all() %>% 
   tidy_stringdist() %>% 
   arrange(osa) %>% 
