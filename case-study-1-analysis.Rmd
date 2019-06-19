@@ -77,8 +77,22 @@ head(beer_brewery,6)
 
 tail(beer_brewery,6)
 
-#looking for duplicated data in character vectors that we can combine 
-library(tidystringdist)
+#looking for duplicated data in character vectors that we can combine
+  
+  library(tidystringdist)
+  ###############
+  # Method name	Description
+  # osa	Optimal string aligment, (restricted Damerau-Levenshtein distance).
+  # lv	Levenshtein distance (as in R's native adist).
+  # dl	Full Damerau-Levenshtein distance.
+  # hamming	Hamming distance (a and b must have same nr of characters).
+  # lcs	Longest common substring distance.
+  # qgram	q-gram distance.
+  # cosine	cosine distance between q-gram profiles
+  # jaccard	Jaccard distance between q-gram profiles
+  # jw	Jaro, or Jaro-Winker distance.
+  # soundex	Distance based on soundex encoding (see below)
+
 unique(beer_brewery$Beer_name) %>% 
   tidy_comb_all() %>% 
   tidy_stringdist() %>% 
@@ -97,31 +111,63 @@ unique(beer_brewery$Brewery_name) %>%
   arrange(osa) %>% 
   View()
 
-# 
-# Method name	Description
-# osa	Optimal string aligment, (restricted Damerau-Levenshtein distance).
-# lv	Levenshtein distance (as in R's native adist).
-# dl	Full Damerau-Levenshtein distance.
-# hamming	Hamming distance (a and b must have same nr of characters).
-# lcs	Longest common substring distance.
-# qgram	q-gram distance.
-# cosine	cosine distance between q-gram profiles
-# jaccard	Jaccard distance between q-gram profiles
-# jw	Jaro, or Jaro-Winker distance.
-# soundex	Distance based on soundex encoding (see below)
-
 ```
 
 # Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
+```{r ABV/IBU Median by State, echo=TRUE}
 
+beer_brewery_stats<-beer_brewery %>%
+  group_by(State) %>%
+  summarise(
+    beer_count= n(),
+    IBU_count = sum(!is.na(IBU)),
+    IBU_average = mean(IBU, na.rm = TRUE),
+    IBU_median = median(IBU, na.rm = TRUE),
+    IBU_sd = sd(IBU, na.rm = TRUE),
+    
+    ABV_count = sum(!is.na(ABV)),
+    ABV_average = mean(ABV, na.rm = TRUE),
+    ABV_median = median(ABV, na.rm = TRUE),
+    ABV_sd = sd(ABV, na.rm = TRUE),
+  ) 
+
+#barplot of median IBU, maybe do the top 10 and bottom 10 
+beer_brewery_stats %>% 
+  ggplot(aes(x=State, y=IBU_median)) + geom_col()
+
+#barplot of median ABV, maybe do the top 10 and bottom 10 
+beer_brewery_stats %>% 
+  ggplot(aes(x=State, y=ABV_median)) + geom_col()
+
+
+
+#relationship between IBU and ABV
+beer_brewery %>% 
+  ggplot(aes(x=IBU, y=ABV)) + geom_point()
+
+```
 
 
 # Which state has the maximum alcoholic (ABV) beer? 
 
+```{r maximum alcoholic (ABV) beer, echo=TRUE}
+
+
+
+
+```
+
 
 # Which state has the most bitter (IBU) beer?
+
+```{r most bitter(IBU) beer, echo=TRUE}
+
+```
 
 
 #Summary statistics for the ABV variable.
 
+```{r summary statistics for the ABV variable, echo=TRUE}
+
+```
 
