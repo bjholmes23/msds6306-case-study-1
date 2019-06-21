@@ -55,6 +55,21 @@ breweryData %>%
 #no missing values 
 ```
 
+```{r get population data, echo=TRUE}
+
+library("httr")
+library("jsonlite")
+
+url <- "https://api.census.gov/data/2018/pep/population?get=POP,GEONAME&for=state"
+
+statepop_raw<- url %>% 
+  GET() %>% 
+  content("text") %>%
+  fromJSON(flatten=TRUE) %>% 
+  as_tibble()
+
+```
+
 #How many breweries in each state
 
 ```{r how many breweries in each state, echo=TRUE}
