@@ -44,7 +44,6 @@ beerData %>%
 beerData %>% 
     filter(is.na(ABV) |is.na(IBU) | is.na(Style)) %>% View()
 #hmm what should be done about the missing values...
-#1.   How many breweries are present in each state?
 
 summary(breweryData)
 glimpse(breweryData)
@@ -55,6 +54,16 @@ breweryData %>%
   summarise_all(funs(sum(is.na(.))))#count the number of NAs or blanks
 #no missing values 
 ```
+
+#How many breweries in each state
+
+```{r how many breweries in each state, echo=TRUE}
+breweryData %>% 
+  group_by(State) %>% 
+  summarise(Number_of_breweries=n()) %>% 
+  arrange(desc(Number_of_breweries))
+```
+
 # Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
 
 ```{r merge data, echo=TRUE}
@@ -116,8 +125,11 @@ beer_brewery_byState<-beer_brewery %>%
 beer_brewery_byState<-beer_brewery %>%
   filter(!is.na(ABV_rating)) %>% 
   count(State,ABV_rating) %>% 
-  spread(ABV_rating,n, fill=0,sep = "_") %>% 
+  spread(ABV_rating,n, fill=0,sep = "_") %>%
   right_join(beer_brewery_byState, by="State")
+
+beer_brewery_byState<-beer_brewery_byState %>%
+  mutate()
 
 #add category counts for IBU_rating
 beer_brewery_byState<-beer_brewery %>%
@@ -129,12 +141,41 @@ beer_brewery_byState<-beer_brewery %>%
 beer_brewery_byState %>% View()
 
 #barplot of median IBU by state, maybe do the top 10 and bottom 10 becuase it's crowded
-beer_brewery_byState %>% 
-  ggplot(aes(x=State, y=IBU_median)) + geom_col()
+beer_brewery_byState %>%
+  arrange(IBU_median) %>% 
+  mutate(State=factor(State, levels=State)) %>%
+  head(10) %>% 
+  ggplot(aes(x=State, y=IBU_median)) + geom_col()+ 
+  labs(title="States with Highest IBU", 
+       subtitle="")
+  
+beer_brewery_byState %>%
+  arrange(desc(IBU_median)) %>% 
+  mutate(State=factor(State, levels=State)) %>%
+  head(10) %>% 
+  ggplot(aes(x=State, y=IBU_median)) + geom_col() + 
+  labs(title="States with Lowest IBU", 
+       subtitle="")
 
 #barplot of median ABV by state, maybe do the top 10 and bottom 10 because it's crowded
-beer_brewery_byState %>% 
-  ggplot(aes(x=State, y=ABV_median)) + geom_col()
+beer_brewery_byState %>%
+  arrange(ABV_median) %>% 
+  mutate(State=factor(State, levels=State)) %>%
+  head(10) %>% 
+  ggplot(aes(x=State, y=ABV_median)) + geom_col() + 
+  coord_flip()+ 
+  labs(title="States with Highest ABV", 
+       subtitle="")
+
+  
+beer_brewery_byState %>%
+  arrange(desc(ABV_median)) %>% 
+  mutate(State=factor(State, levels=State)) %>%
+  head(10) %>% 
+  ggplot(aes(x=State, y=ABV_median)) + geom_col() + 
+  coord_flip() + 
+  labs(title="States with Lowest ABV", 
+       subtitle="")
 
 #relationship between IBU and ABV
 beer_brewery %>% 
