@@ -9,11 +9,15 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(officer)
+library(magrittr)
 ```
 
 ```{r injest data, echo=TRUE}
 beerData<-read_csv("./Beers.csv")
 breweryData<-read_csv("./Breweries.csv")
+#Read baseline PowerPoint file
+my_pres <- read_pptx('Anheuser-Busch_Breweries.pptx') 
 ```
 
 ```{r exploratory data analysis, echo=TRUE}
