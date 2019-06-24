@@ -64,9 +64,9 @@ breweryData %>%
 library("httr")
 library("jsonlite")
 
-url <- "https://api.census.gov/data/2018/pep/population?get=POP,GEONAME&for=state"
+pop_url <- "https://api.census.gov/data/2018/pep/population?get=POP,GEONAME&for=state"
 
-statepop_raw<- url %>% 
+statepop_raw<- pop_url %>% 
   GET() %>% 
   content("text") %>%
   fromJSON(flatten=TRUE) %>% 
@@ -80,15 +80,32 @@ statepop_raw$State_Abb <- c(sort(c("DC",state.abb)),"PR")
 
 ```
 
+```{r get state area data, echo=TRUE}
+library(rvest)
+
+area_url <-"https://en.wikipedia.org/wiki/List_of_U.S._states_and_territories_by_area"
+
+statearea<- area_url %>% 
+  read_html() %>% 
+  html_node('#mw-content-text > div > table:nth-child(6)') %>% 
+  html_table(header = F) %>% 
+  slice(3:n()) %>% #remove the two rows which are labels
+  select(X1,X6) %>% #keep the state area excluding water
+  rename("State_name"="X1","Area (sq miles)"="X6")
+  
+```
+
 #How many breweries in each state
 
 ```{r how many breweries in each state, echo=TRUE}
 breweryData %>% 
   group_by(State) %>% 
   summarise(Number_of_breweries=n()) %>% 
-  arrange(desc(Number_of_breweries))
+  arrange(desc(Number_of_breweries)) 
 
 # Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
+```
+
 
 ```{r merge data, echo=TRUE}
 
