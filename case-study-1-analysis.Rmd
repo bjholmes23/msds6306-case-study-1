@@ -60,9 +60,9 @@ breweryData %>%
 library("httr")
 library("jsonlite")
 
-url <- "https://api.census.gov/data/2018/pep/population?get=POP,GEONAME&for=state"
+census_url <- "https://api.census.gov/data/2018/pep/population?get=POP,GEONAME&for=state"
 
-statepop_raw<- url %>% 
+statepop_raw<- census_url %>% 
   GET() %>% 
   content("text") %>%
   fromJSON(flatten=TRUE) %>% 
@@ -73,6 +73,12 @@ names(statepop_raw)<-c("Population","State","State_ID")
 
 #add state abbreviations and DC/puerto rico
 statepop_raw$State_Abb <- c(sort(c("DC",state.abb)),"PR")
+
+```
+
+```{r get state area data, echo=TRUE}
+
+
 
 ```
 
