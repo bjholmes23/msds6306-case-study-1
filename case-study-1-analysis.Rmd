@@ -75,6 +75,9 @@ statepop_raw<- url %>%
 
 names(statepop_raw)<-c("Population","State","State_ID")
 
+#add state abbreviations and DC/puerto rico
+statepop_raw$State_Abb <- c(sort(c("DC",state.abb)),"PR")
+
 ```
 
 #How many breweries in each state
@@ -84,7 +87,6 @@ breweryData %>%
   group_by(State) %>% 
   summarise(Number_of_breweries=n()) %>% 
   arrange(desc(Number_of_breweries))
-```
 
 # Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
 
@@ -141,7 +143,8 @@ beer_brewery_byState<-beer_brewery %>%
     ABV_average = mean(ABV, na.rm = TRUE),
     ABV_median = median(ABV, na.rm = TRUE),
     ABV_sd = sd(ABV, na.rm = TRUE),
-  ) 
+    Number_of_breweries=length(unique(Brewery_name))
+  )
 
 #add category counts for ABV_rating
 beer_brewery_byState<-beer_brewery %>%
@@ -159,6 +162,13 @@ beer_brewery_byState<-beer_brewery %>%
   count(State,IBU_rating) %>% 
   spread(IBU_rating,n, fill=0,sep = "_") %>% 
   right_join(beer_brewery_byState, by="State") 
+
+
+#add in population values
+beer_brewery_byState<-beer_brewery_byState %>% 
+  left_join(y=statepop_raw, by=c("State"="State_Abb")) %>% 
+  mutate(State_name=State.y) %>% 
+  select(c(-State_ID,-State.y)) 
 
 beer_brewery_byState %>% View()
 
