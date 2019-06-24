@@ -187,6 +187,11 @@ beer_brewery_byState<-beer_brewery_byState %>%
   mutate(State_name=State.y) %>% 
   select(c(-State_ID,-State.y)) 
 
+#add in state area
+beer_brewery_byState<-beer_brewery_byState %>% 
+  left_join(y=statearea, by="State_name") 
+
+
 beer_brewery_byState %>% View()
 
 #barplot of median IBU by state, maybe do the top 10 and bottom 10 becuase it's crowded
