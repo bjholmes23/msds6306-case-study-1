@@ -26,7 +26,14 @@ beerData<-read_csv("./Beers.csv")
 breweryData<-read_csv("./Breweries.csv")
 #Read baseline PowerPoint file
 my_pres <- read_pptx('Anheuser-Busch_Breweries.pptx') 
-layout_summary(my_pres)
+view(layout_summary(my_pres))
+view(layout_properties(my_pres))
+#create title slide
+my_pres <- add_slide(my_pres, layout = "Title Slide", master = "Office Theme")
+my_pres <- ph_with_text(x=my_pres, type="Title Slide", str = "Anheumer-Bush Market Analysis")
+#write content to ppt
+extension <- format(Sys.time(),'%b%d%H%M%S')
+print(my_pres, target = paste(".\\Anheuser-Busch_Breweries", extension, "v2.pptx", sep='') )
 
 ```
 
