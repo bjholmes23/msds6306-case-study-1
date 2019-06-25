@@ -49,8 +49,6 @@ beerData %>%
 #hmm what should be done about the missing values...
 ```
 
-
-
 ```{r exploratory brewery data aggregation by state, echo=TRUE}
 
 glimpse(breweryData)
@@ -176,7 +174,8 @@ beer_brewery_byState<-beer_brewery %>%
     ABV_average = mean(ABV, na.rm = TRUE),
     ABV_median = median(ABV, na.rm = TRUE),
     ABV_sd = sd(ABV, na.rm = TRUE),
-    Number_of_breweries=length(unique(Brewery_name))
+    Number_of_breweries=length(unique(Brewery_name)),
+    Number_of_styles=length(unique(Style))
   )
 
 #add category counts for ABV_rating
