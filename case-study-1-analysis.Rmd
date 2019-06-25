@@ -20,13 +20,14 @@ breweryData<-read_csv("./Breweries.csv")
 my_pres <- read_pptx('Anheuser-Busch_Breweries.pptx') 
 ```
 
-```{r exploratory data analysis, echo=TRUE}
+```{r exploratory beerData analysis, echo=TRUE}
 ###b. What are the dimensions of the data?
 
-summary(beerData)
 glimpse(beerData)
+summary(beerData)
 #Name              Beer_ID            ABV               IBU           Brewery_id       Style               Ounces 
 
+#beer summarized by style 
 beerData %>%
   group_by(Style) %>%
   summarise(
@@ -34,23 +35,26 @@ beerData %>%
     IBU_count = sum(!is.na(IBU)),
     IBU_average = mean(IBU, na.rm = TRUE),
     IBU_sd = sd(IBU, na.rm = TRUE),
-    
     ABV_count = sum(!is.na(ABV)),
     ABV_average = mean(ABV, na.rm = TRUE),
     ABV_sd = sd(ABV, na.rm = TRUE),
-  ) %>% View()
+  ) 
 
 beerData %>% 
-  summarise_all(funs(sum(is.na(.)))) %>% View()#count the number of NAs or blanks 
+  summarise_all(funs(sum(is.na(.)))) #count the number of NAs or blanks 
 # ABV, IBU, Style have missing values 
-# maybe we should do "imputation"? 
 
 beerData %>% 
-    filter(is.na(ABV) |is.na(IBU) | is.na(Style)) %>% View()
+    filter(is.na(ABV) |is.na(IBU) | is.na(Style)) 
 #hmm what should be done about the missing values...
+```
 
-summary(breweryData)
+
+
+```{r exploratory brewery data aggregation by state, echo=TRUE}
+
 glimpse(breweryData)
+summary(breweryData)
 #    Brew_ID          Name               City              State          
 
 #Report the number of NA's in each column.
@@ -75,6 +79,8 @@ statepop_raw<- pop_url %>%
 
 names(statepop_raw)<-c("Population","State","State_ID")
 
+statepop_raw$Population<- as.integer(statepop_raw$Population)
+
 #add state abbreviations and DC/puerto rico
 statepop_raw$State_Abb <- c(sort(c("DC",state.abb)),"PR")
 
@@ -91,7 +97,8 @@ statearea<- area_url %>%
   html_table(header = F) %>% 
   slice(3:n()) %>% #remove the two rows which are labels
   select(X1,X6) %>% #keep the state area excluding water
-  rename("State_name"="X1","Area (sq miles)"="X6")
+  rename("State_name"="X1","Square_miles"="X6") %>% 
+  mutate(Square_miles=as.integer(Square_miles))
   
 ```
 
@@ -116,16 +123,19 @@ beer_brewery<-beerData %>%
   mutate(ABV_rating= cut_number(ABV, n = 3,labels=c("low","medium","high"))) %>% 
   mutate(IBU_rating= cut_number(IBU, n = 3,labels=c("low","medium","high"))) 
   
-
 beer_brewery %>% 
   filter(is.na(Brewery_name)) 
 #returns no results so all beers have a brewery
 
+#Post merge data peak 
 head(beer_brewery,6)
 tail(beer_brewery,6)
 
 ```
-```{r data exploration, echo=FALSE}
+
+
+
+```{r looking for bad data, echo=FALSE}
 #looking for duplicated data in character vectors
 lookForDupStrings <- function(string_arr){
   library(tidystringdist)
@@ -133,20 +143,26 @@ lookForDupStrings <- function(string_arr){
     unique() %>% 
     tidy_comb_all() %>% 
     tidy_stringdist() %>% 
-    arrange(osa) %>% 
-    View()
+    arrange(osa)
 }
 
 lookForDupStrings(beer_brewery$Beer_name)
-
+#there are a lot of simliar beer names, including those just differing by year.
+#however it looks like good data
 lookForDupStrings(beer_brewery$Style)
+#these look pretty good actually
 
 lookForDupStrings(beer_brewery$Brewery_name)
+#TODO(bjh)there are duplicated breweries for cleanup, for example
+#breweryData %>% filter(str_detect(Name,"Grain"))
+#  Brew_ID Name                          City       State
+#     <int> <chr>                         <chr>      <chr>
+# 1       2 Against the Grain Brewery     Louisville KY   
+# 2      63 Against The Grain Brewery     Louisville KY   
 ```
 
-
 # Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
-```{r ABV/IBU Median by State, echo=TRUE}
+```{r Aggregations by State, echo=TRUE}
 
 beer_brewery_byState<-beer_brewery %>%
   group_by(State) %>%
@@ -170,9 +186,6 @@ beer_brewery_byState<-beer_brewery %>%
   spread(ABV_rating,n, fill=0,sep = "_") %>%
   right_join(beer_brewery_byState, by="State")
 
-beer_brewery_byState<-beer_brewery_byState %>%
-  mutate()
-
 #add category counts for IBU_rating
 beer_brewery_byState<-beer_brewery %>%
   filter(!is.na(IBU_rating)) %>% 
@@ -180,20 +193,25 @@ beer_brewery_byState<-beer_brewery %>%
   spread(IBU_rating,n, fill=0,sep = "_") %>% 
   right_join(beer_brewery_byState, by="State") 
 
-
 #add in population values
 beer_brewery_byState<-beer_brewery_byState %>% 
   left_join(y=statepop_raw, by=c("State"="State_Abb")) %>% 
-  mutate(State_name=State.y) %>% 
-  select(c(-State_ID,-State.y)) 
+  select(c(-State_ID)) %>% 
+  rename(State_name=State.y) %>% 
+  mutate(breweries_per_million_person=(1000000*Number_of_breweries/Population))
 
 #add in state area
 beer_brewery_byState<-beer_brewery_byState %>% 
-  left_join(y=statearea, by="State_name") 
+  left_join(y=statearea, by="State_name") %>% 
+  mutate(breweries_per_million_sqmiles=(1000000*Square_miles/Population))
 
 
-beer_brewery_byState %>% View()
+beer_brewery_byState 
 
+```
+
+
+```{r IBU Plots, echo=TRUE}
 #barplot of median IBU by state, maybe do the top 10 and bottom 10 becuase it's crowded
 beer_brewery_byState %>%
   arrange(IBU_median) %>% 
@@ -210,7 +228,9 @@ beer_brewery_byState %>%
   ggplot(aes(x=State, y=IBU_median)) + geom_col() + 
   labs(title="States with Lowest IBU", 
        subtitle="")
+```
 
+```{r ABV Plots, echo=TRUE}
 #barplot of median ABV by state, maybe do the top 10 and bottom 10 because it's crowded
 beer_brewery_byState %>%
   arrange(ABV_median) %>% 
@@ -231,7 +251,9 @@ beer_brewery_byState %>%
   labs(title="States with Lowest ABV", 
        subtitle="")
 
-#relationship between IBU and ABV
+```
+
+```{r relationship between IBU and ABV, echo=TRUE}
 beer_brewery %>% 
   ggplot(aes(x=IBU, y=ABV)) + geom_point()
 
@@ -242,6 +264,10 @@ beer_brewery %>%
 
 ```{r maximum alcoholic (ABV) beer, echo=TRUE}
 
+#top 10 states for having high ABV beers
+beer_brewery_byState %>% 
+  arrange(desc(ABV_rating_high)) %>% 
+  head(10)
 
 ```
 
@@ -250,12 +276,19 @@ beer_brewery %>%
 
 ```{r most bitter(IBU) beer, echo=TRUE}
 
+#top 10 states for having high IBU beers
+beer_brewery_byState %>% 
+  arrange(desc(IBU_rating_high)) %>% 
+  head(10)
 ```
 
 
 #Summary statistics for the ABV variable.
 
 ```{r summary statistics for the ABV variable, echo=TRUE}
+
+summary(beerData$ABV)
+hist(beerData$ABV)
 
 ```
 
