@@ -18,6 +18,8 @@ beerData<-read_csv("./Beers.csv")
 breweryData<-read_csv("./Breweries.csv")
 #Read baseline PowerPoint file
 my_pres <- read_pptx('Anheuser-Busch_Breweries.pptx') 
+layout_summary(my_pres)
+
 ```
 
 ```{r exploratory beerData analysis, echo=TRUE}
@@ -103,11 +105,23 @@ statearea<- area_url %>%
 #How many breweries in each state
 
 ```{r how many breweries in each state, echo=TRUE}
-breweryData %>% 
+brewstate<-breweryData %>% 
   group_by(State) %>% 
   summarise(Number_of_breweries=n()) %>% 
-  arrange(desc(Number_of_breweries)) 
+  arrange(desc(Number_of_breweries))
+view(brewstate)
+my_pres <- my_pres %>% 
+  add_slide(layout = "Title and Content", master = "Office Theme")
+my_pres <- my_pres %>% 
+  ph_with(value = "First 5 Brew States", location = ph_location_type(type = "title")) %>%
+  ph_with(value = "A footer", location = ph_location_type(type = "ftr")) %>%
+  ph_with(value = format(Sys.Date()), location = ph_location_type(type = "dt")) %>%
+  ph_with(value = "slide 1", location = ph_location_type(type = "sldNum")) %>%
+  ph_with(value = head(brewstate,6), location = ph_location_type(type = "body"))
 
+#write content to ppt
+print(my_pres, target = ".\\Anheuser-Busch_Breweriesv2.pptx") 
+```
 # Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
 ```
 
@@ -128,6 +142,32 @@ beer_brewery %>%
 #Post merge data peak 
 head(beer_brewery,6)
 tail(beer_brewery,6)
+
+doc <- read_pptx()
+
+# add a "Two Content" slide and then content ----
+doc <- add_slide(doc, layout = "Two Content", master = "Office Theme")
+doc <- ph_with(x = doc, value = pi, location = ph_location_type(type = "title") )
+doc <- ph_with(x = doc, value = as.factor(letters[1:2]), location = ph_location_type(type = "ftr") )
+doc <- ph_with(x = doc, value = c("Un titre", "Deux titre"), location = ph_location_left() )
+doc <- ph_with(x = doc, value = iris[1:4, 3:5], location = ph_location_right() )
+
+# add a "Title and Content" slide and then a ggplot object ----
+if( require("ggplot2") ){
+  doc <- add_slide(doc, layout = "Title and Content",
+                   master = "Office Theme")
+  gg_plot <- ggplot(data = iris ) +
+    geom_point(mapping = aes(Sepal.Length, Petal.Length),
+               size = 3) + theme_minimal()
+  doc <- ph_with(x = doc, value = gg_plot, location = ph_location_fullsize() )
+}
+
+# add an image ----
+doc <- add_slide(doc, layout = "Title and Content", master = "Office Theme")
+img.file <- file.path( R.home("doc"), "html", "heatmap.jpg" )
+#img.file <- file.path( "./", "html", "heatmap.jpg" )
+#doc <- ph_with(x = doc, external_img(img.file, 100/72, 76/72), 
+  location = ph_location_type(type = "body") )
 
 ```
 
@@ -290,4 +330,5 @@ summary(beerData$ABV)
 hist(beerData$ABV)
 
 ```
+
 
