@@ -11,6 +11,14 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(officer)
 library(magrittr)
+
+#maps
+library(spData)
+library(mapdata)
+library(maps)
+library(stringr)
+library(viridis)
+
 ```
 
 ```{r injest data, echo=TRUE}
@@ -46,7 +54,7 @@ beerData %>%
     IBU_sd = sd(IBU, na.rm = TRUE),
     ABV_count = sum(!is.na(ABV)),
     ABV_average = mean(ABV, na.rm = TRUE),
-    ABV_sd = sd(ABV, na.rm = TRUE),
+    ABV_sd = sd(ABV, na.rm = TRUE)
   ) 
 
 beerData %>% 
@@ -251,6 +259,23 @@ beer_brewery_byState<-beer_brewery_byState %>%
 beer_brewery_byState<-beer_brewery_byState %>% 
   left_join(y=statearea, by="State_name") %>% 
   mutate(breweries_per_thousand_sqmiles=(1000*Number_of_breweries/Square_miles))
+
+```
+
+```{r prepare data for mapping, echo=TRUE}
+
+states <- map_data("state")
+
+map_data<-beer_brewery_byState %>% 
+  mutate(State_name=tolower(State_name)) %>%  #to match the state mapping data
+  right_join(states, by=c("State_name"="region"))
+
+state_base <- ggplot(data = map_data, mapping = aes(x = long, y = lat, group = group)) +
+      geom_polygon(color = "black", fill = "gray") + 
+      theme_void()
+
+state_base +
+      geom_polygon(data = map_data, aes(fill = IBU_median))
 
 ```
 
