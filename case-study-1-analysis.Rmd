@@ -267,8 +267,57 @@ state_base <- ggplot(data = map_data, mapping = aes(x = long, y = lat, group = g
       geom_polygon(color = "black", fill = "gray") + 
       theme_void()
 
+```
+
+```{r state maps, echo=TRUE}
+
+state_base +
+      geom_polygon(data = map_data, aes(fill = Population)) #TODO(BJH) think about breaking into subregions 
+
 state_base +
       geom_polygon(data = map_data, aes(fill = IBU_median))
+
+state_base +
+      geom_polygon(data = map_data, aes(fill = ABV_median))
+
+state_base +
+      geom_polygon(data = map_data, aes(fill = ABV_rating_high))
+
+state_base +
+      geom_polygon(data = map_data, aes(fill = ABV_rating_high/Population))
+
+state_base +
+      geom_polygon(data = map_data, aes(fill = ABV_rating_medium))
+
+state_base +
+      geom_polygon(data = map_data, aes(fill = ABV_rating_low))
+
+state_base +
+      geom_polygon(data = map_data, aes(fill = IBU_rating_high))
+
+state_base +
+      geom_polygon(data = map_data, aes(fill = IBU_rating_medium))
+
+state_base +
+      geom_polygon(data = map_data, aes(fill = IBU_rating_low))
+
+state_base +
+      geom_polygon(data = map_data, aes(fill = Number_of_breweries))
+
+state_base +
+      geom_polygon(data = map_data, aes(fill = Number_of_beers))
+
+state_base +
+      geom_polygon(data = map_data, aes(fill = Number_of_styles))
+
+state_base +
+      geom_polygon(data = map_data, aes(fill = breweries_per_million_person))
+
+state_base +
+      geom_polygon(data = map_data, aes(fill = ABV_sd))
+
+state_base +
+      geom_polygon(data = map_data, aes(fill = IBU_sd))
 
 ```
 
