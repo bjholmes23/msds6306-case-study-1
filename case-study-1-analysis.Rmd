@@ -96,7 +96,7 @@ statearea<- area_url %>%
   slice(3:n()) %>% #remove the two rows which are labels
   select(X1,X6) %>% #keep the state area excluding water
   rename("State_name"="X1","Square_miles"="X6") %>% 
-  mutate(Square_miles=as.integer(Square_miles))
+  mutate(Square_miles=as.numeric(gsub(",", "", Square_miles))) #numbers have thousands separator ","
   
 ```
 
@@ -165,7 +165,9 @@ lookForDupStrings(beer_brewery$Brewery_name)
 beer_brewery_byState<-beer_brewery %>%
   group_by(State) %>%
   summarise(
-    beer_count= n(),
+    Number_of_beers= n(),
+    Number_of_breweries=length(unique(Brewery_name)),
+    Number_of_styles=length(unique(Style)),
     IBU_count = sum(!is.na(IBU)),
     IBU_average = mean(IBU, na.rm = TRUE),
     IBU_median = median(IBU, na.rm = TRUE),
@@ -173,9 +175,7 @@ beer_brewery_byState<-beer_brewery %>%
     ABV_count = sum(!is.na(ABV)),
     ABV_average = mean(ABV, na.rm = TRUE),
     ABV_median = median(ABV, na.rm = TRUE),
-    ABV_sd = sd(ABV, na.rm = TRUE),
-    Number_of_breweries=length(unique(Brewery_name)),
-    Number_of_styles=length(unique(Style))
+    ABV_sd = sd(ABV, na.rm = TRUE)
   )
 
 #add category counts for ABV_rating
@@ -199,10 +199,10 @@ beer_brewery_byState<-beer_brewery_byState %>%
   rename(State_name=State.y) %>% 
   mutate(breweries_per_million_person=(1000000*Number_of_breweries/Population))
 
-#add in state area
+#add in state area in Square_miles
 beer_brewery_byState<-beer_brewery_byState %>% 
   left_join(y=statearea, by="State_name") %>% 
-  mutate(breweries_per_million_sqmiles=(1000000*Square_miles/Population))
+  mutate(breweries_per_thousand_sqmiles=(1000*Number_of_breweries/Square_miles))
 
 
 beer_brewery_byState 
