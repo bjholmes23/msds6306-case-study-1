@@ -281,8 +281,21 @@ state_base <- ggplot(data = map_data, mapping = aes(x = long, y = lat, group = g
 state_base +
       geom_polygon(data = map_data, aes(fill = Population)) #TODO(BJH) think about breaking into subregions 
 
+library(grid)
+library(gridExtra)
+
+#Example on how to arrange multiple plots 
 state_base +
-      geom_polygon(data = map_data, aes(fill = IBU_median))
+      geom_polygon(data = map_data, aes(fill = IBU_median)) -> IBU_median_plot
+
+grid.arrange(
+  IBU_median_plot + scale_fill_viridis(option="A") + labs(x="Virdis A", y=NULL),
+  IBU_median_plot + scale_fill_viridis(option="B") + labs(x="Virdis B", y=NULL),
+  IBU_median_plot + scale_fill_viridis(option="C") + labs(x="Virdis C", y=NULL),
+  IBU_median_plot + scale_fill_viridis(option="D") + labs(x="Virdis D", y=NULL),
+  IBU_median_plot + scale_fill_viridis(option="E") + labs(x="Virdis E", y=NULL),
+  ncol=3, nrow=2
+)
 
 state_base +
       geom_polygon(data = map_data, aes(fill = ABV_median))
