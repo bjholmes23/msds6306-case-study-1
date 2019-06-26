@@ -2,7 +2,7 @@
 title: "MSDS 6306: Case 1 "
 author:
   - "Blake Holmes and Mel Schwan"
-date: "June 20, 2019"
+date: "June 27, 2019"
 output: 
   html_document
 ---
@@ -241,32 +241,52 @@ library(grid)
 library(gridExtra)
 
 #Example on how to arrange multiple plots 
-state_base +
-      geom_polygon(data = map_data, aes(fill = IBU_median)) -> IBU_median_plot
 
+#General Statistics
 grid.arrange(
-  IBU_median_plot + scale_fill_viridis(option="A") + labs(x="Virdis A", y=NULL),
-  IBU_median_plot + scale_fill_viridis(option="B") + labs(x="Virdis B", y=NULL),
-  IBU_median_plot + scale_fill_viridis(option="C") + labs(x="Virdis C", y=NULL),
-  IBU_median_plot + scale_fill_viridis(option="D") + labs(x="Virdis D", y=NULL),
-  IBU_median_plot + scale_fill_viridis(option="E") + labs(x="Virdis E", y=NULL),
-  ncol=3, nrow=2
+    state_base + geom_polygon(data = map_data, aes(fill = Number_of_breweries)) +
+      scale_fill_viridis(option="D"),
+    state_base + geom_polygon(data = map_data, aes(fill = Number_of_beers)) +
+      scale_fill_viridis(option="D"),
+    state_base + geom_polygon(data = map_data, aes(fill = Number_of_styles)) +
+      scale_fill_viridis(option="D"),
+    state_base + geom_polygon(data = map_data, aes(fill = breweries_per_million_person)) +
+      scale_fill_viridis(option="D"),
+    state_base + geom_polygon(data = map_data, aes(fill = Population)) +
+      scale_fill_viridis(option="D"),
+    ncol=3, nrow=2
 )
 
-state_base +
-      geom_polygon(data = map_data, aes(fill = ABV_median))
 
-state_base +
-      geom_polygon(data = map_data, aes(fill = ABV_rating_high))
+#ABV data mapped 
+grid.arrange(
+  state_base + geom_polygon(data = map_data, aes(fill = ABV_rating_high)) + scale_fill_viridis(option="D"), 
+  state_base + geom_polygon(data = map_data, aes(fill = ABV_rating_medium)) + scale_fill_viridis(option="D"), 
+  state_base + geom_polygon(data = map_data, aes(fill = ABV_rating_low))+ scale_fill_viridis(option="D"),  
+  state_base + geom_polygon(data = map_data, aes(fill = ABV_sd)) + scale_fill_viridis(option="D"),
+  state_base + geom_polygon(data = map_data, aes(fill = ABV_median)) + scale_fill_viridis(option="D"),
+    ncol=3, nrow=2
+)
+
+
+#IBU data mapped 
+grid.arrange(
+  state_base + geom_polygon(data = map_data, aes(fill = IBU_rating_high)) + scale_fill_viridis(option="D"), 
+  state_base + geom_polygon(data = map_data, aes(fill = IBU_rating_medium)) + scale_fill_viridis(option="D"), 
+  state_base + geom_polygon(data = map_data, aes(fill = IBU_rating_low))+ scale_fill_viridis(option="D"),  
+  state_base + geom_polygon(data = map_data, aes(fill = IBU_sd)) + scale_fill_viridis(option="D"),
+  state_base + geom_polygon(data = map_data, aes(fill = IBU_median)) + scale_fill_viridis(option="D"),
+    ncol=3, nrow=2
+)
 
 state_base +
       geom_polygon(data = map_data, aes(fill = ABV_rating_high/Population))
 
 state_base +
-      geom_polygon(data = map_data, aes(fill = ABV_rating_medium))
+      geom_polygon(data = map_data, aes(fill = ABV_rating_low))
 
 state_base +
-      geom_polygon(data = map_data, aes(fill = ABV_rating_low))
+      geom_polygon(data = map_data, aes(fill = ABV_sd))
 
 state_base +
       geom_polygon(data = map_data, aes(fill = IBU_rating_high))
@@ -276,21 +296,6 @@ state_base +
 
 state_base +
       geom_polygon(data = map_data, aes(fill = IBU_rating_low))
-
-state_base +
-      geom_polygon(data = map_data, aes(fill = Number_of_breweries))
-
-state_base +
-      geom_polygon(data = map_data, aes(fill = Number_of_beers))
-
-state_base +
-      geom_polygon(data = map_data, aes(fill = Number_of_styles))
-
-state_base +
-      geom_polygon(data = map_data, aes(fill = breweries_per_million_person))
-
-state_base +
-      geom_polygon(data = map_data, aes(fill = ABV_sd))
 
 state_base +
       geom_polygon(data = map_data, aes(fill = IBU_sd))
