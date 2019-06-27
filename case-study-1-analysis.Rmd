@@ -262,8 +262,7 @@ general_statistics<-grid.arrange(
       scale_fill_viridis(option="D"),
     state_base + geom_polygon(data = map_data, aes(fill = breweries_per_million_person)) +
       scale_fill_viridis(option="D"),
-    state_base + geom_polygon(data = map_data, aes(fill = Population)) +
-      scale_fill_viridis(option="D"),
+    state_base + geom_polygon(data = map_data, aes(fill = Population/1000000))  + labs(fill = "Population (millions)") + scale_fill_viridis(option="D"),
     ncol=3, nrow=2
 )
 
