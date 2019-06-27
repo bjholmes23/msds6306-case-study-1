@@ -2,7 +2,7 @@
 title: "MSDS 6306: Case 1 "
 author:
   - "Blake Holmes and Mel Schwan"
-date: "June 20, 2019"
+date: "June 27, 2019"
 output: 
   html_document
 ---
@@ -44,15 +44,23 @@ beerData %>%
     IBU_sd = sd(IBU, na.rm = TRUE),
     ABV_count = sum(!is.na(ABV)),
     ABV_average = mean(ABV, na.rm = TRUE),
-    ABV_sd = sd(ABV, na.rm = TRUE)
+    ABV_sd = sd(ABV, na.rm = TRUE), 
+    Ounces_count = sum(!is.na(Ounces)),
+    Ounces_average = mean(Ounces, na.rm = TRUE),
+    Ounces_sd = sd(Ounces, na.rm = TRUE), 
   ) 
 
-beerData %>% 
-  summarise_all(funs(sum(is.na(.)))) #count the number of NAs or blanks 
-# ABV, IBU, Style have missing values 
+#Percentage of missing values in dataset
+paste0("The total number of beers is: ", nrow(beerData))
+
 
 beerData %>% 
-    filter(is.na(ABV) |is.na(IBU) | is.na(Style)) 
+  summarise_all(funs(100*sum(is.na(.))/nrow(beerData))) %>% #count the number of NAs or blanks divided by total rows
+  round(2) %>% 
+  lapply(function(x){paste0(x,"%")}) %>%
+  as_tibble()
+# ABV, IBU, Style have missing values 
+
 #hmm what should be done about the missing values...
 ```
 
@@ -187,7 +195,11 @@ beer_brewery_byState<-beer_brewery %>%
     ABV_count = sum(!is.na(ABV)),
     ABV_average = mean(ABV, na.rm = TRUE),
     ABV_median = median(ABV, na.rm = TRUE),
-    ABV_sd = sd(ABV, na.rm = TRUE)
+    ABV_sd = sd(ABV, na.rm = TRUE),
+    Ounces_count = sum(!is.na(Ounces)),
+    Ounces_average = mean(Ounces, na.rm = TRUE),
+    Ounces_median = median(Ounces, na.rm = TRUE),
+    Ounces_sd = sd(Ounces, na.rm = TRUE),
   )
 
 #add category counts for ABV_rating
@@ -241,32 +253,55 @@ library(grid)
 library(gridExtra)
 
 #Example on how to arrange multiple plots 
-state_base +
-      geom_polygon(data = map_data, aes(fill = IBU_median)) -> IBU_median_plot
 
+#General Statistics
+general_statistics<-grid.arrange(
+    state_base + geom_polygon(data = map_data, aes(fill = Number_of_breweries)) +
+      scale_fill_viridis(option="D"),
+    state_base + geom_polygon(data = map_data, aes(fill = Number_of_beers)) +
+      scale_fill_viridis(option="D"),
+    state_base + geom_polygon(data = map_data, aes(fill = Number_of_styles)) +
+      scale_fill_viridis(option="D"),
+    state_base + geom_polygon(data = map_data, aes(fill = Ounces_median)) +
+      scale_fill_viridis(option="D"),
+    state_base + geom_polygon(data = map_data, aes(fill = breweries_per_million_person)) +
+      scale_fill_viridis(option="D"),
+    state_base + geom_polygon(data = map_data, aes(fill = Population/1000000))  + labs(fill = "Population (millions)") + scale_fill_viridis(option="D"),
+    ncol=3, nrow=2
+)
+
+#ABV data mapped 
 grid.arrange(
-  IBU_median_plot + scale_fill_viridis(option="A") + labs(x="Virdis A", y=NULL),
-  IBU_median_plot + scale_fill_viridis(option="B") + labs(x="Virdis B", y=NULL),
-  IBU_median_plot + scale_fill_viridis(option="C") + labs(x="Virdis C", y=NULL),
-  IBU_median_plot + scale_fill_viridis(option="D") + labs(x="Virdis D", y=NULL),
-  IBU_median_plot + scale_fill_viridis(option="E") + labs(x="Virdis E", y=NULL),
-  ncol=3, nrow=2
+  state_base + geom_polygon(data = map_data, aes(fill = ABV_rating_high)) + scale_fill_viridis(option="D"), 
+  state_base + geom_polygon(data = map_data, aes(fill = ABV_rating_medium)) + scale_fill_viridis(option="D"), 
+  state_base + geom_polygon(data = map_data, aes(fill = ABV_rating_low))+ scale_fill_viridis(option="D"),  
+  state_base + geom_polygon(data = map_data, aes(fill = ABV_sd)) + scale_fill_viridis(option="D"),
+  state_base + geom_polygon(data = map_data, aes(fill = ABV_median)) + scale_fill_viridis(option="D"),
+    ncol=3, nrow=2
+)
+
+
+#IBU data mapped 
+grid.arrange(
+  state_base + geom_polygon(data = map_data, aes(fill = IBU_rating_high)) + scale_fill_viridis(option="D"), 
+  state_base + geom_polygon(data = map_data, aes(fill = IBU_rating_medium)) + scale_fill_viridis(option="D"), 
+  state_base + geom_polygon(data = map_data, aes(fill = IBU_rating_low))+ scale_fill_viridis(option="D"),  
+  state_base + geom_polygon(data = map_data, aes(fill = IBU_sd)) + scale_fill_viridis(option="D"),
+  state_base + geom_polygon(data = map_data, aes(fill = IBU_median)) + scale_fill_viridis(option="D"),
+    ncol=3, nrow=2
 )
 
 state_base +
-      geom_polygon(data = map_data, aes(fill = ABV_median))
-
-state_base +
-      geom_polygon(data = map_data, aes(fill = ABV_rating_high))
+      geom_polygon(data = map_data, aes(fill = Ounces_median))
 
 state_base +
       geom_polygon(data = map_data, aes(fill = ABV_rating_high/Population))
 
 state_base +
-      geom_polygon(data = map_data, aes(fill = ABV_rating_medium))
+      geom_polygon(data = map_data, aes(fill = ABV_rating_low))
 
 state_base +
-      geom_polygon(data = map_data, aes(fill = ABV_rating_low))
+      geom_polygon(data = map_data, aes(fill = ABV_sd))
 
 state_base +
       geom_polygon(data = map_data, aes(fill = IBU_rating_high))
@@ -276,21 +311,6 @@ state_base +
 
 state_base +
       geom_polygon(data = map_data, aes(fill = IBU_rating_low))
-
-state_base +
-      geom_polygon(data = map_data, aes(fill = Number_of_breweries))
-
-state_base +
-      geom_polygon(data = map_data, aes(fill = Number_of_beers))
-
-state_base +
-      geom_polygon(data = map_data, aes(fill = Number_of_styles))
-
-state_base +
-      geom_polygon(data = map_data, aes(fill = breweries_per_million_person))
-
-state_base +
-      geom_polygon(data = map_data, aes(fill = ABV_sd))
 
 state_base +
       geom_polygon(data = map_data, aes(fill = IBU_sd))
@@ -322,32 +342,61 @@ ggsave('Low_median_alch.jpg')
 ```{r ABV Plots, echo=TRUE}
 #barplot of median ABV by state, maybe do the top 10 and bottom 10 because it's crowded
 beer_brewery_byState %>%
-  arrange(ABV_median) %>% 
-  mutate(State=factor(State, levels=State)) %>%
+  arrange(ABV_median) %>% #lowest to highest
+  mutate(State=factor(State, levels=State)) %>%# To set the order appropriately for the plot
   head(10) %>% 
   ggplot(aes(x=State, y=ABV_median)) + geom_col() + 
   coord_flip()+ 
-  labs(title="States with Highest ABV", 
+  labs(title="States with Lowest ABV", 
        subtitle="")
 ggsave('bottom_abv_summary.jpg')
   
 beer_brewery_byState %>%
-  arrange(desc(ABV_median)) %>% 
-  mutate(State=factor(State, levels=State)) %>%
+  arrange(desc(ABV_median)) %>% highest to lowers 
+  mutate(State=factor(State, levels=State)) %>% # To set the order appropriately for the plot
   head(10) %>% 
   ggplot(aes(x=State, y=ABV_median)) + geom_col() + 
   coord_flip() + 
-  labs(title="States with Lowest ABV", 
+  labs(title="States with Highest ABV", 
        subtitle="")
 ggsave('top_abv_summary.jpg')
 ```
 
 ```{r relationship between IBU and ABV, echo=TRUE}
+#BASIC POSITIVE CORRELATION 
+
 beer_brewery %>% 
-  ggplot(aes(x=IBU, y=ABV)) + geom_point()
+  ggplot(aes(x=IBU, y=ABV)) + geom_point()+ 
+    labs(title="ABV and IBU Scatterplot")
+
+
+#WITH MARKER INDICATING MARKET OPPORTUNITY
+beer_brewery %>% 
+  ggplot(aes(x=IBU, y=ABV)) + 
+  geom_point() + 
+  annotate("rect", xmin=c(50), xmax=c(120), ymin=c(.035) , ymax=c(.06), alpha=0.2, color="blue", fill="blue") + 
+  annotate("text", label="Opportunity", x=c(70), y=c(.04), color="Blue")+ 
+    labs(title="ABV and IBU Scatterplot", 
+       subtitle="Market Opportunity")
+
 ggsave('ibu_abv_scat.jpg')
 ```
 
+```{r OUNCES relationships, echo=TRUE}
+  beer_brewery %>% 
+    ggplot(aes(x=Ounces, y=IBU)) + geom_point(position = "jitter")+ 
+      labs(title="IBU and OUNCES Scatterplot")
+
+ beer_brewery %>% 
+  ggplot(aes(x=Ounces, y=ABV)) + geom_point(position = "jitter")+ 
+    labs(title="ABV and OUNCES Scatterplot")
+
+```
+
+```{r relationship between Ounces and ABV, echo=TRUE}
+beer_brewery %>% 
+  ggplot(aes(x=Ounces, y=ABV)) + geom_point(position = "jitter")
+```
 
 # Which state has the maximum alcoholic (ABV) beer? 
 
@@ -360,24 +409,75 @@ top_abv<-beer_brewery_byState %>%
 
 ```
 
-
-# Which state has the most bitter (IBU) beer?
+# Which state has highest variance in ABV?
 
 ```{r most bitter(IBU) beer, echo=TRUE}
 
-#top 10 states for having high IBU beers
-top_ibu<-beer_brewery_byState %>% 
-  arrange(desc(IBU_rating_high)) %>% 
+#top 10 states with the most variance in ABV
+top_abv_sd<-beer_brewery_byState %>% 
+  arrange(desc(ABV_sd)) %>% 
+  head(10)
+
+#top 10 states with the least variance in ABV
+bottom_abv_sd<-beer_brewery_byState %>% 
+  arrange(ABV_sd) %>% 
   head(10)
 ```
 
+
+# Which states have the most and least variance in beers?
+```{r most and least variance in ABV, echo=TRUE}
+
+#top 10 states with the most variance in ABV
+top_abv_sd<-beer_brewery_byState %>% 
+  arrange(desc(ABV_sd)) %>% 
+  head(10)
+
+#top 10 states with the least variance in ABV
+bottom_abv_sd<-beer_brewery_byState %>% 
+  arrange(ABV_sd) %>% 
+  head(10)
+```
+
+```{r most and least variance in IBU, echo=TRUE}
+
+#top 10 states with the most variance in IBU
+top_ibu_sd<-beer_brewery_byState %>% 
+  arrange(desc(IBU_sd)) %>% 
+  head(10)
+
+#top 10 states with the least variance in IBU
+bottom_ibu_sd<-beer_brewery_byState %>% 
+  arrange(IBU_sd) %>% 
+  head(10)
+```
+
+#Summary statistics for the IBU variable.
+
+```{r summary statistics for the IBU variable, echo=TRUE}
+
+summary(beerData$IBU)
+
+ggplot(beerData, aes(x=IBU)) +
+     geom_histogram(position="identity", alpha=0.5)+
+     geom_vline(data=beerData,aes(xintercept=median(beerData$IBU)),linetype="dashed")+
+     labs(title="International Bitterness Unit(IBU) Histogram",x="IBU", y = "Count") + 
+     geom_vline(aes(xintercept = median(IBU, na.rm=T)),linetype="dotted", color="black") + annotate("text", x = c(33), y = c(120), label = c(paste("Median", median(beerData$IBU, na.rm=T))) , color="black", size=5 , angle=90, fontface="bold")
+
+
+```
 
 #Summary statistics for the ABV variable.
 
 ```{r summary statistics for the ABV variable, echo=TRUE}
 
 summary(beerData$ABV)
-hist(beerData$ABV)
+
+ggplot(beerData, aes(x=ABV)) +
+     geom_histogram(position="identity", alpha=0.5)+
+     geom_vline(data=beerData,aes(xintercept=median(beerData$ABV)),linetype="dashed")+
+     labs(title="Alcohol By Volume(ABV) Histogram",x="ABV", y = "Count") + 
+     geom_vline(aes(xintercept = median(ABV, na.rm=T)),linetype="dotted", color="black") + annotate("text", x = c(.053), y = c(150), label = c(paste("Median", median(beerData$ABV, na.rm=T))) , color="black", size=5 , angle=90, fontface="bold")
 
 ```
  
@@ -454,12 +554,9 @@ my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office T
   ph_with(external_img(src = filename, width = 8, height = 4.5),
           location = ph_location(left = 3, top = 2, width = 8, height = 4.5))
 
-
-
 # Print to save powerpoint
 extension <- format(Sys.time(),'%b%d%H%M%S')
 print(my_pres, target = paste(".\\anheuser-budwieser", extension, "v2.pptx", sep='') )
-
 
 ```
 
