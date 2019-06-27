@@ -50,13 +50,14 @@ beerData %>%
     Ounces_sd = sd(Ounces, na.rm = TRUE), 
   ) 
 
-#TODO(BJH) CONVERT TO PERCENTAGE
-beerData %>% 
-  summarise_all(funs(sum(is.na(.))/n())) #count the number of NAs or blanks 
+#Percentage of missing values in dataset
+test<-beerData %>% 
+  summarise_all(funs(100*sum(is.na(.))/nrow(beerData))) %>% #count the number of NAs or blanks divided by total rows
+  round(2) %>% 
+  lapply(function(x){paste0(x,"%")}) %>%
+  as_tibble()
 # ABV, IBU, Style have missing values 
 
-beerData %>% 
-    filter(is.na(ABV) |is.na(IBU) | is.na(Style)) 
 #hmm what should be done about the missing values...
 ```
 
