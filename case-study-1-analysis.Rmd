@@ -51,7 +51,7 @@ beerData %>%
   ) 
 
 #Percentage of missing values in dataset
-test<-beerData %>% 
+beerData %>% 
   summarise_all(funs(100*sum(is.na(.))/nrow(beerData))) %>% #count the number of NAs or blanks divided by total rows
   round(2) %>% 
   lapply(function(x){paste0(x,"%")}) %>%
