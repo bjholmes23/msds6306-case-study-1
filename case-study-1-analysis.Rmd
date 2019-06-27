@@ -54,11 +54,12 @@ beerData %>%
 paste0("The total number of beers is: ", nrow(beerData))
 
 
-beerData %>% 
+percent_missing<-beerData %>% 
   summarise_all(funs(100*sum(is.na(.))/nrow(beerData))) %>% #count the number of NAs or blanks divided by total rows
   round(2) %>% 
   lapply(function(x){paste0(x,"%")}) %>%
   as_tibble()
+missing_info <- paste('  ABV >', percent_missing$ABV, '  IBU >', percent_missing$IBU, '  Style >', percent_missing$Style)
 # ABV, IBU, Style have missing values 
 
 #hmm what should be done about the missing values...
@@ -125,8 +126,8 @@ brewstate<-breweryData %>%
   summarise(Number_of_breweries=n()) %>% 
   arrange(desc(Number_of_breweries))
 view(brewstate)
-top_brewstate<-head(brewstate,5) 
-bottom_brewstate<-tail(brewstate,5)
+top_brewstate <- head(brewstate,5) 
+bottom_brewstate <- tail(brewstate,5)
 
 ```
 # Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
@@ -269,7 +270,7 @@ general_statistics<-grid.arrange(
     state_base + geom_polygon(data = map_data, aes(fill = Population/1000000))  + labs(fill = "Population (millions)") + scale_fill_viridis(option="D"),
     ncol=3, nrow=2
 )
-
+ggsave('brewers_ratings.jpg')
 #ABV data mapped 
 grid.arrange(
   state_base + geom_polygon(data = map_data, aes(fill = ABV_rating_high)) + scale_fill_viridis(option="D"), 
@@ -280,7 +281,7 @@ grid.arrange(
     ncol=3, nrow=2
 )
 
-
+ggsave('abv_ratings.jpg')
 #IBU data mapped 
 grid.arrange(
   state_base + geom_polygon(data = map_data, aes(fill = IBU_rating_high)) + scale_fill_viridis(option="D"), 
@@ -290,37 +291,45 @@ grid.arrange(
   state_base + geom_polygon(data = map_data, aes(fill = IBU_median)) + scale_fill_viridis(option="D"),
     ncol=3, nrow=2
 )
-
+ggsave('ibu_ratings.jpg')
 state_base +
       geom_polygon(data = map_data, aes(fill = Ounces_median))
-
+ggsave('Ounces_data.jpg')
 state_base +
       geom_polygon(data = map_data, aes(fill = ABV_rating_high/Population))
-
+ggsave('ABV_high_data.jpg')
 state_base +
       geom_polygon(data = map_data, aes(fill = ABV_rating_low))
-
+ggsave('ABV_low_data.jpg')
 state_base +
       geom_polygon(data = map_data, aes(fill = ABV_sd))
-
+ggsave('ABV_SD_data.jpg')
 state_base +
       geom_polygon(data = map_data, aes(fill = IBU_rating_high))
-
+ggsave('ibu_high_data.jpg')
 state_base +
       geom_polygon(data = map_data, aes(fill = IBU_rating_medium))
-
+ggsave('ibu_med_data.jpg')
 state_base +
       geom_polygon(data = map_data, aes(fill = IBU_rating_low))
-
+ggsave('ibu_low_data.jpg')
 state_base +
       geom_polygon(data = map_data, aes(fill = IBU_sd))
-
+ggsave('ibu_SD_data.jpg')
 ```
 
 
 ```{r IBU Plots, echo=TRUE}
+#top 10 states for having high IBU beers
+top_ibu<-beer_brewery_byState %>% 
+  arrange(desc(IBU_rating_high)) %>% 
+  head(10)
+#bottom 10 states for having high IBU beers
+bottom_ibu<-beer_brewery_byState %>% 
+  arrange(desc(IBU_rating_high)) %>% 
+  tail(10)
 #barplot of median IBU by state, maybe do the top 10 and bottom 10 becuase it's crowded
-beer_brewery_byState %>%
+top_ibu<-beer_brewery_byState %>%
   arrange(IBU_median) %>% 
   mutate(State=factor(State, levels=State)) %>%
   head(10) %>% 
@@ -350,9 +359,9 @@ beer_brewery_byState %>%
   labs(title="States with Lowest ABV", 
        subtitle="")
 ggsave('bottom_abv_summary.jpg')
-  
+
 beer_brewery_byState %>%
-  arrange(desc(ABV_median)) %>% highest to lowers 
+  arrange(desc(ABV_median)) %>% #highest to lowers 
   mutate(State=factor(State, levels=State)) %>% # To set the order appropriately for the plot
   head(10) %>% 
   ggplot(aes(x=State, y=ABV_median)) + geom_col() + 
@@ -440,6 +449,10 @@ bottom_abv_sd<-beer_brewery_byState %>%
 ```
 
 ```{r most and least variance in IBU, echo=TRUE}
+#top 10 states for having high IBU beers
+top_ibu<-beer_brewery_byState %>% 
+  arrange(desc(IBU_rating_high)) %>% 
+  head(10)
 
 #top 10 states with the most variance in IBU
 top_ibu_sd<-beer_brewery_byState %>% 
@@ -463,7 +476,7 @@ ggplot(beerData, aes(x=IBU)) +
      geom_vline(data=beerData,aes(xintercept=median(beerData$IBU)),linetype="dashed")+
      labs(title="International Bitterness Unit(IBU) Histogram",x="IBU", y = "Count") + 
      geom_vline(aes(xintercept = median(IBU, na.rm=T)),linetype="dotted", color="black") + annotate("text", x = c(33), y = c(120), label = c(paste("Median", median(beerData$IBU, na.rm=T))) , color="black", size=5 , angle=90, fontface="bold")
-
+ggsave('IBU_by_volume.jpg')
 
 ```
 
@@ -478,7 +491,7 @@ ggplot(beerData, aes(x=ABV)) +
      geom_vline(data=beerData,aes(xintercept=median(beerData$ABV)),linetype="dashed")+
      labs(title="Alcohol By Volume(ABV) Histogram",x="ABV", y = "Count") + 
      geom_vline(aes(xintercept = median(ABV, na.rm=T)),linetype="dotted", color="black") + annotate("text", x = c(.053), y = c(150), label = c(paste("Median", median(beerData$ABV, na.rm=T))) , color="black", size=5 , angle=90, fontface="bold")
-
+ggsave('abv_by_volume.jpg')
 ```
  
   
@@ -509,20 +522,72 @@ my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office T
 my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>%
   ph_with(value = "First Breweries Combined Beer", location = ph_location(left = 3, top = .5, width = 8, height = 1)) %>%
   ph_with_table_at(value = first_combo_brewery,
-                   height = 4.5, width = 12, left = .5, top = 1,
+                   height = 4.0, width = 12, left = .5, top = 1,
                    last_row = FALSE, last_column = FALSE, first_row = TRUE)
 
 # Merged breweries data last six
 my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>%
   ph_with(value = "Last Breweries Combined Beer", location = ph_location(left = 3, top = .5, width = 8, height = 1)) %>%
   ph_with_table_at(value = last_combo_brewery,
-                   height = 4.5, width = 12, left = .5, top = 1,
+                   height = 4.0, width = 12, left = .5, top = 1,
                    last_row = FALSE, last_column = FALSE, first_row = TRUE)
 # How many NA's were found
 my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>% 
-  ph_with(value = "HOW MUCH MISSING DATA DID WE FIND?", location = ph_location(left = 3, top = .5, width = 8, height = 1)) %>%
-  ph_with(external_img(src = 'zero.png', width = 8, height = 4.5), 
-          location = ph_location(left = 3, top = 2, width = 8, height = 4.5)) 
+  ph_with(value = "What Data Was Missing?", location = ph_location(left = 3.5, top = .5, width = 8, height = 1)) %>%
+  ph_with(value = missing_info, location = ph_location(left = 2.5, top = 3, width = 12, height = 1))
+
+
+
+
+
+#Compute the population, breweries, and beer styles by state 
+filename = "ibu_SD_data.jpg"
+my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>% 
+  ph_with(value = "States IBU Standard Deviation", location = ph_location(left = 3, top = .5, width = 10, height = 1)) %>%
+  ph_with(external_img(src = filename, width = 10, height = 6), 
+          location = ph_location(left = 1.5, top = 1, width = 10, height = 6)) 
+#Compute ibu high 
+filename = "ibu_high_data.jpg"
+my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>% 
+  ph_with(value = "States IBU High", location = ph_location(left = 3, top = .5, width = 10, height = 1)) %>%
+  ph_with(external_img(src = filename, width = 10, height = 6), 
+          location = ph_location(left = 1.5, top = 1, width = 10, height = 6)) 
+
+#Compute ibu ratings 
+filename = "ibu_ratings.jpg"
+my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>% 
+  ph_with(value = "States IBU Ratings", location = ph_location(left = 3, top = .5, width = 10, height = 1)) %>%
+  ph_with(external_img(src = filename, width = 10, height = 6), 
+          location = ph_location(left = 1.5, top = 1, width = 10, height = 6)) 
+
+#Compute abv sd 
+filename = "abv_sd_data.jpg"
+my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>% 
+  ph_with(value = "States ABV Standard Deviation", location = ph_location(left = 3, top = .5, width = 10, height = 1)) %>%
+  ph_with(external_img(src = filename, width = 10, height = 6), 
+          location = ph_location(left = 1.5, top = 1, width = 10, height = 6)) 
+
+#Compute abv high 
+filename = "abv_high_data.jpg"
+my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>% 
+  ph_with(value = "States ABV High", location = ph_location(left = 3, top = .5, width = 10, height = 1)) %>%
+  ph_with(external_img(src = filename, width = 10, height = 6), 
+          location = ph_location(left = 1.5, top = 1, width = 10, height = 6)) 
+
+#Compute abv ratings 
+filename = "abv_ratings.jpg"
+my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>% 
+  ph_with(value = "States ABV Ratings", location = ph_location(left = 3, top = .5, width = 10, height = 1)) %>%
+  ph_with(external_img(src = filename, width = 10, height = 6), 
+          location = ph_location(left = 1.5, top = 1, width = 10, height = 6)) 
+
+#Compute brewers ratings 
+filename = "brewers_ratings.jpg"
+my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>% 
+  ph_with(value = "States Brewers Ratings", location = ph_location(left = 3, top = .5, width = 10, height = 1)) %>%
+  ph_with(external_img(src = filename, width = 10, height = 6), 
+          location = ph_location(left = 1.5, top = 1, width = 10, height = 6)) 
+
 
 #Compute the median alcohol content and international bitterness unit for each state. 
 filename = "Hi_median_alch.jpg"
@@ -532,10 +597,10 @@ my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office T
           location = ph_location(left = 3, top = 2, width = 8, height = 4.5)) 
 
 # States with the max bitterness and max alcohol
-my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>%
-  ph_with(value = "States With the Most ABV and IBU", type='Title', location = ph_location(left = 2, top = .5, width = 8, height = 1)) %>%
-  ph_with(value = c("State with the most ABV beers is ",head(top_abv,1)$State), type='body', location = ph_location(left = 2, top = 2, width = 10, height = 1)) %>%
-  ph_with(value = c("State with the most IBU is ",head(top_ibu,1)$State), type='body',location = ph_location(left = 2, top = 5, width = 10, height = 1)) 
+my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>% 
+  ph_with(value = "Highest ABV & IBU by State", location = ph_location(left = 2, top = .5, width = 8, height = 1)) %>%
+  ph_with(value = paste("State with the most ABV beers is ",head(top_abv,1)$State),  location = ph_location(left = 1, top = 3, width = 12, height = 1)) %>%
+  ph_with(value = paste("State with the most IBU beers is ",head(top_ibu,1)$State), location = ph_location(left = 1, top = 5, width = 12, height = 1)) 
 
 #Compute the median alcohol content and international bitterness unit for each state. 
 filename1 = "top_abv_summary.jpg"
@@ -547,6 +612,19 @@ my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office T
   ph_with(external_img(src = filename2, width = 4, height = 3.5), 
           location = ph_location(left = 8, top = 2, width = 5, height = 4.5)) 
 
+#Compute alcohol by volume 
+filename = "abv_by_volume.jpg"
+my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>% 
+  ph_with(value = "Alcohol by Volume", location = ph_location(left = 3, top = .5, width = 10, height = 1)) %>%
+  ph_with(external_img(src = filename, width = 10, height = 6), 
+          location = ph_location(left = 1.5, top = 1, width = 10, height = 6)) 
+#Compute bitterness by volume 
+filename = "ibu_by_volume.jpg"
+my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>% 
+  ph_with(value = "Bitterness by Volume", location = ph_location(left = 3, top = .5, width = 10, height = 1)) %>%
+  ph_with(external_img(src = filename, width = 10, height = 6), 
+          location = ph_location(left = 1.5, top = 1, width = 10, height = 6)) 
+
 #Compute the relationship between IBU and ABV
 filename = "ibu_abv_scat.jpg"
 my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>%
@@ -554,9 +632,22 @@ my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office T
   ph_with(external_img(src = filename, width = 8, height = 4.5),
           location = ph_location(left = 3, top = 2, width = 8, height = 4.5))
 
+#Summary slide
+filename = "summary.jpg"
+my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>%
+  ph_with(value = "Summary and Opportunities", location = ph_location(left = 2.5, top = .5, width = 10, height = 1)) %>%
+  ph_with(external_img(src = filename, width = 13, height = 7.5),
+          location = ph_location(left = .15, top = .15, width = 13, height = 7.5))
+#Repository slide
+filename = "repository.jpg"
+my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office Theme") %>%
+  ph_with(external_img(src = filename, width = 13, height = 7.5),
+          location = ph_location(left = .15, top = .15, width = 13, height = 7.5))
+
+  
 # Print to save powerpoint
 extension <- format(Sys.time(),'%b%d%H%M%S')
-print(my_pres, target = paste(".\\anheuser-budwieser", extension, "v2.pptx", sep='') )
+print(my_pres, target = paste(".\\anheuser-budwieser", extension, "v1.pptx", sep='') )
 
 ```
 
