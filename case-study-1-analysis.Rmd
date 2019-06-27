@@ -251,12 +251,14 @@ library(gridExtra)
 #Example on how to arrange multiple plots 
 
 #General Statistics
-grid.arrange(
+general_statistics<-grid.arrange(
     state_base + geom_polygon(data = map_data, aes(fill = Number_of_breweries)) +
       scale_fill_viridis(option="D"),
     state_base + geom_polygon(data = map_data, aes(fill = Number_of_beers)) +
       scale_fill_viridis(option="D"),
     state_base + geom_polygon(data = map_data, aes(fill = Number_of_styles)) +
+      scale_fill_viridis(option="D"),
+    state_base + geom_polygon(data = map_data, aes(fill = Ounces_median)) +
       scale_fill_viridis(option="D"),
     state_base + geom_polygon(data = map_data, aes(fill = breweries_per_million_person)) +
       scale_fill_viridis(option="D"),
@@ -362,8 +364,7 @@ ggsave('top_abv_summary.jpg')
 
 beer_brewery %>% 
   ggplot(aes(x=IBU, y=ABV)) + geom_point()+ 
-    labs(title="ABV and IBU Scatterplot", 
-       subtitle="Market Opportunity")
+    labs(title="ABV and IBU Scatterplot")
 
 
 #WITH MARKER INDICATING MARKET OPPORTUNITY
