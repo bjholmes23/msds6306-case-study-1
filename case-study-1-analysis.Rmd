@@ -44,7 +44,10 @@ beerData %>%
     IBU_sd = sd(IBU, na.rm = TRUE),
     ABV_count = sum(!is.na(ABV)),
     ABV_average = mean(ABV, na.rm = TRUE),
-    ABV_sd = sd(ABV, na.rm = TRUE)
+    ABV_sd = sd(ABV, na.rm = TRUE), 
+    Ounces_count = sum(!is.na(Ounces)),
+    Ounces_average = mean(Ounces, na.rm = TRUE),
+    Ounces_sd = sd(Ounces, na.rm = TRUE), 
   ) 
 
 #TODO(BJH) CONVERT TO PERCENTAGE
@@ -188,7 +191,11 @@ beer_brewery_byState<-beer_brewery %>%
     ABV_count = sum(!is.na(ABV)),
     ABV_average = mean(ABV, na.rm = TRUE),
     ABV_median = median(ABV, na.rm = TRUE),
-    ABV_sd = sd(ABV, na.rm = TRUE)
+    ABV_sd = sd(ABV, na.rm = TRUE),
+    Ounces_count = sum(!is.na(Ounces)),
+    Ounces_average = mean(Ounces, na.rm = TRUE),
+    Ounces_median = median(Ounces, na.rm = TRUE),
+    Ounces_sd = sd(Ounces, na.rm = TRUE),
   )
 
 #add category counts for ABV_rating
@@ -280,6 +287,9 @@ grid.arrange(
 )
 
 state_base +
+      geom_polygon(data = map_data, aes(fill = Ounces_median))
+
+state_base +
       geom_polygon(data = map_data, aes(fill = ABV_rating_high/Population))
 
 state_base +
@@ -348,11 +358,30 @@ ggsave('top_abv_summary.jpg')
 ```
 
 ```{r relationship between IBU and ABV, echo=TRUE}
+#BASIC POSITIVE CORRLEATION 
+
 beer_brewery %>% 
-  ggplot(aes(x=IBU, y=ABV)) + geom_point()
+  ggplot(aes(x=IBU, y=ABV)) + geom_point()+ 
+    labs(title="ABV and IBU Scatterplot", 
+       subtitle="Market Opportunity")
+
+
+#WITH MARKER INDICATING MARKET OPPORTUNITY
+beer_brewery %>% 
+  ggplot(aes(x=IBU, y=ABV)) + 
+  geom_point() + 
+  annotate("rect", xmin=c(50), xmax=c(120), ymin=c(.035) , ymax=c(.06), alpha=0.2, color="blue", fill="blue") + 
+  annotate("text", label="Opportunity", x=c(70), y=c(.04), color="Blue")+ 
+    labs(title="ABV and IBU Scatterplot", 
+       subtitle="Market Opportunity")
+
 ggsave('ibu_abv_scat.jpg')
 ```
 
+```{r relationship between Ounces and ABV, echo=TRUE}
+beer_brewery %>% 
+  ggplot(aes(x=Ounces, y=ABV)) + geom_point()
+```
 
 # Which state has the maximum alcoholic (ABV) beer? 
 
