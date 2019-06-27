@@ -51,6 +51,9 @@ beerData %>%
   ) 
 
 #Percentage of missing values in dataset
+paste0("The total number of beers is: ", nrow(beerData))
+
+
 beerData %>% 
   summarise_all(funs(100*sum(is.na(.))/nrow(beerData))) %>% #count the number of NAs or blanks divided by total rows
   round(2) %>% 
@@ -339,28 +342,28 @@ ggsave('Low_median_alch.jpg')
 ```{r ABV Plots, echo=TRUE}
 #barplot of median ABV by state, maybe do the top 10 and bottom 10 because it's crowded
 beer_brewery_byState %>%
-  arrange(ABV_median) %>% 
-  mutate(State=factor(State, levels=State)) %>%
+  arrange(ABV_median) %>% #lowest to highest
+  mutate(State=factor(State, levels=State)) %>%# To set the order appropriately for the plot
   head(10) %>% 
   ggplot(aes(x=State, y=ABV_median)) + geom_col() + 
   coord_flip()+ 
-  labs(title="States with Highest ABV", 
+  labs(title="States with Lowest ABV", 
        subtitle="")
 ggsave('bottom_abv_summary.jpg')
   
 beer_brewery_byState %>%
-  arrange(desc(ABV_median)) %>% 
-  mutate(State=factor(State, levels=State)) %>%
+  arrange(desc(ABV_median)) %>% highest to lowers 
+  mutate(State=factor(State, levels=State)) %>% # To set the order appropriately for the plot
   head(10) %>% 
   ggplot(aes(x=State, y=ABV_median)) + geom_col() + 
   coord_flip() + 
-  labs(title="States with Lowest ABV", 
+  labs(title="States with Highest ABV", 
        subtitle="")
 ggsave('top_abv_summary.jpg')
 ```
 
 ```{r relationship between IBU and ABV, echo=TRUE}
-#BASIC POSITIVE CORRLEATION 
+#BASIC POSITIVE CORRELATION 
 
 beer_brewery %>% 
   ggplot(aes(x=IBU, y=ABV)) + geom_point()+ 
@@ -379,9 +382,20 @@ beer_brewery %>%
 ggsave('ibu_abv_scat.jpg')
 ```
 
+```{r OUNCES relationships, echo=TRUE}
+  beer_brewery %>% 
+    ggplot(aes(x=Ounces, y=IBU)) + geom_point(position = "jitter")+ 
+      labs(title="IBU and OUNCES Scatterplot")
+
+ beer_brewery %>% 
+  ggplot(aes(x=Ounces, y=ABV)) + geom_point(position = "jitter")+ 
+    labs(title="IBU and OUNCES Scatterplot")
+
+```
+
 ```{r relationship between Ounces and ABV, echo=TRUE}
 beer_brewery %>% 
-  ggplot(aes(x=Ounces, y=ABV)) + geom_point()
+  ggplot(aes(x=Ounces, y=ABV)) + geom_point(position = "jitter")
 ```
 
 # Which state has the maximum alcoholic (ABV) beer? 
@@ -395,17 +409,48 @@ top_abv<-beer_brewery_byState %>%
 
 ```
 
-
-# Which state has the most bitter (IBU) beer?
+# Which state has highest variance in ABV?
 
 ```{r most bitter(IBU) beer, echo=TRUE}
 
-#top 10 states for having high IBU beers
-top_ibu<-beer_brewery_byState %>% 
-  arrange(desc(IBU_rating_high)) %>% 
+#top 10 states with the most variance in ABV
+top_abv_sd<-beer_brewery_byState %>% 
+  arrange(desc(ABV_sd)) %>% 
+  head(10)
+
+#top 10 states with the least variance in ABV
+bottom_abv_sd<-beer_brewery_byState %>% 
+  arrange(ABV_sd) %>% 
   head(10)
 ```
 
+
+# Which states have the most and least variance in beers?
+```{r most and least variance in ABV, echo=TRUE}
+
+#top 10 states with the most variance in ABV
+top_abv_sd<-beer_brewery_byState %>% 
+  arrange(desc(ABV_sd)) %>% 
+  head(10)
+
+#top 10 states with the least variance in ABV
+bottom_abv_sd<-beer_brewery_byState %>% 
+  arrange(ABV_sd) %>% 
+  head(10)
+```
+
+```{r most and least variance in IBU, echo=TRUE}
+
+#top 10 states with the most variance in IBU
+top_ibu_sd<-beer_brewery_byState %>% 
+  arrange(desc(IBU_sd)) %>% 
+  head(10)
+
+#top 10 states with the least variance in IBU
+bottom_ibu_sd<-beer_brewery_byState %>% 
+  arrange(IBU_sd) %>% 
+  head(10)
+```
 
 #Summary statistics for the IBU variable.
 
@@ -512,7 +557,6 @@ my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office T
 # Print to save powerpoint
 extension <- format(Sys.time(),'%b%d%H%M%S')
 print(my_pres, target = paste(".\\anheuser-budwieser", extension, "v2.pptx", sep='') )
-
 
 ```
 
