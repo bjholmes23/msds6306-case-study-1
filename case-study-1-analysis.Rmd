@@ -389,7 +389,7 @@ ggsave('ibu_abv_scat.jpg')
 
  beer_brewery %>% 
   ggplot(aes(x=Ounces, y=ABV)) + geom_point(position = "jitter")+ 
-    labs(title="IBU and OUNCES Scatterplot")
+    labs(title="ABV and OUNCES Scatterplot")
 
 ```
 
