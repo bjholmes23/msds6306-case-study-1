@@ -47,8 +47,9 @@ beerData %>%
     ABV_sd = sd(ABV, na.rm = TRUE)
   ) 
 
+#TODO(BJH) CONVERT TO PERCENTAGE
 beerData %>% 
-  summarise_all(funs(sum(is.na(.)))) #count the number of NAs or blanks 
+  summarise_all(funs(sum(is.na(.))/n())) #count the number of NAs or blanks 
 # ABV, IBU, Style have missing values 
 
 beerData %>% 
@@ -257,7 +258,6 @@ grid.arrange(
     ncol=3, nrow=2
 )
 
-
 #ABV data mapped 
 grid.arrange(
   state_base + geom_polygon(data = map_data, aes(fill = ABV_rating_high)) + scale_fill_viridis(option="D"), 
@@ -377,12 +377,32 @@ top_ibu<-beer_brewery_byState %>%
 ```
 
 
+#Summary statistics for the IBU variable.
+
+```{r summary statistics for the IBU variable, echo=TRUE}
+
+summary(beerData$IBU)
+
+ggplot(beerData, aes(x=IBU)) +
+     geom_histogram(position="identity", alpha=0.5)+
+     geom_vline(data=beerData,aes(xintercept=median(beerData$IBU)),linetype="dashed")+
+     labs(title="International Bitterness Unit(IBU) Histogram",x="IBU", y = "Count") + 
+     geom_vline(aes(xintercept = median(IBU, na.rm=T)),linetype="dotted", color="black") + annotate("text", x = c(33), y = c(120), label = c(paste("Median", median(beerData$IBU, na.rm=T))) , color="black", size=5 , angle=90, fontface="bold")
+
+
+```
+
 #Summary statistics for the ABV variable.
 
 ```{r summary statistics for the ABV variable, echo=TRUE}
 
 summary(beerData$ABV)
-hist(beerData$ABV)
+
+ggplot(beerData, aes(x=ABV)) +
+     geom_histogram(position="identity", alpha=0.5)+
+     geom_vline(data=beerData,aes(xintercept=median(beerData$ABV)),linetype="dashed")+
+     labs(title="Alcohol By Volume(ABV) Histogram",x="ABV", y = "Count") + 
+     geom_vline(aes(xintercept = median(ABV, na.rm=T)),linetype="dotted", color="black") + annotate("text", x = c(.053), y = c(150), label = c(paste("Median", median(beerData$ABV, na.rm=T))) , color="black", size=5 , angle=90, fontface="bold")
 
 ```
  
@@ -458,8 +478,6 @@ my_pres <- add_slide(x=my_pres, layout = "Title and Content", master = "Office T
   ph_with(value = "Relationship Between ABV and IBU", location = ph_location(left = 2.5, top = .5, width = 10, height = 1)) %>%
   ph_with(external_img(src = filename, width = 8, height = 4.5),
           location = ph_location(left = 3, top = 2, width = 8, height = 4.5))
-
-
 
 # Print to save powerpoint
 extension <- format(Sys.time(),'%b%d%H%M%S')
