@@ -47,12 +47,11 @@ beerData %>%
     ABV_sd = sd(ABV, na.rm = TRUE), 
     Ounces_count = sum(!is.na(Ounces)),
     Ounces_average = mean(Ounces, na.rm = TRUE),
-    Ounces_sd = sd(Ounces, na.rm = TRUE), 
+    Ounces_sd = sd(Ounces, na.rm = TRUE)
   ) 
 
 #Percentage of missing values in dataset
 paste0("The total number of beers is: ", nrow(beerData))
-
 
 percent_missing<-beerData %>% 
   summarise_all(funs(100*sum(is.na(.))/nrow(beerData))) %>% #count the number of NAs or blanks divided by total rows
@@ -81,6 +80,7 @@ breweryData %>%
 
 library("httr")
 library("jsonlite")
+
 
 #2018 projected population data
 pop_url <- "https://api.census.gov/data/2018/pep/population?get=POP,GEONAME&for=state"
@@ -113,7 +113,7 @@ statearea<- area_url %>%
   slice(3:n()) %>% #remove the two rows which are labels
   select(X1,X6) %>% #keep the state area excluding water
   rename("State_name"="X1","Square_miles"="X6") %>% 
-  mutate(Square_miles=as.numeric(gsub(",", "", Square_miles))) #numbers have thousands separator ","
+  mutate(Square_miles=as.numeric(gsub(",", "", Square_miles))) #remove thousands separator ","
   
 ```
 
@@ -128,6 +128,8 @@ brewstate<-breweryData %>%
 top_brewstate <- head(brewstate,5) 
 bottom_brewstate <- tail(brewstate,5)
 
+top_brewstate
+bottom_brewstate
 ```
 # Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
 
@@ -304,12 +306,51 @@ state_base +
       geom_polygon(data = map_data, aes(fill = Ounces_median))
 ggsave('Export/Ounces_data.jpg')
 
-state_base +
-      geom_polygon(data = map_data, aes(fill = ABV_rating_high/Population))
+
+#MAPPING ABV BY STATE
+grid.arrange(
+  #HIGH ABV Beers per million people
+  state_base +
+      geom_polygon(data = map_data, aes(fill = ABV_rating_high), show.legend = FALSE) + 
+      scale_fill_continuous(name = "High ABV Beers"), 
+  #MEDIUM ABV Beers per million people
+  state_base +
+      geom_polygon(data = map_data, aes(fill = ABV_rating_medium), show.legend = FALSE) + 
+      scale_fill_continuous(name = "Medium ABV Beers"),  
+  #LOW ABV Beers per million people
+  state_base +
+      geom_polygon(data = map_data, aes(fill = ABV_rating_low),show.legend = FALSE) + 
+    scale_fill_continuous(name = "Low ABV Beers"),
+  #HIGH ABV Beers per million people
+  state_base +
+      geom_polygon(data = map_data, aes(fill = (1000000*ABV_rating_high)/Population),show.legend = FALSE)+
+      scale_fill_continuous(name = "High ABV beers per million people"),
+  #MEDIUM ABV Beers per million people
+  state_base +
+      geom_polygon(data = map_data, aes(fill = (1000000*ABV_rating_medium)/Population),show.legend = FALSE)+
+      scale_fill_continuous(name = "Medium ABV beers per million people"),
+  #LOW ABV Beers per million people
+  state_base +
+      geom_polygon(data = map_data, aes(fill = (1000000*ABV_rating_low)/Population),show.legend = FALSE)+
+      scale_fill_continuous(name = "Low ABV beers per million people")  
+  ,ncol=3, nrow=2
+) %>% 
+  ggsave(filename = "Export/ABV_by_state.jpg")
+
+
+
 ggsave('Export/ABV_high_data.jpg')
 
-state_base +
-      geom_polygon(data = map_data, aes(fill = ABV_rating_low))
+
+
+ggsave('Export/ABV_medium_data.jpg')
+
+
+ggsave('Export/ABV_low_data.jpg')
+
+ 
+      scale_fill_continuous(name = "Number of Low ABV Beers")  
+
 ggsave('Export/ABV_low_data.jpg')
 
 state_base +
@@ -352,7 +393,8 @@ top_ibu<-beer_brewery_byState %>%
   head(10) %>% 
   ggplot(aes(x=State, y=IBU_median)) + geom_col()+ 
   labs(title="States with Highest IBU", 
-       subtitle="")
+       subtitle="", y="Median IBU")
+
 ggsave('Export/Hi_median_alch.jpg')
   
 beer_brewery_byState %>%
@@ -361,7 +403,8 @@ beer_brewery_byState %>%
   head(10) %>% 
   ggplot(aes(x=State, y=IBU_median)) + geom_col() + 
   labs(title="States with Lowest IBU", 
-       subtitle="")
+       y="IBU")
+
 ggsave('Export/Low_median_alch.jpg')
 ```
 
@@ -374,7 +417,7 @@ beer_brewery_byState %>%
   ggplot(aes(x=State, y=ABV_median)) + geom_col() + 
   coord_flip()+ 
   labs(title="States with Lowest ABV", 
-       subtitle="")
+       y="ABV")
 ggsave('Export/bottom_abv_summary.jpg')
 
 beer_brewery_byState %>%
@@ -384,7 +427,7 @@ beer_brewery_byState %>%
   ggplot(aes(x=State, y=ABV_median)) + geom_col() + 
   coord_flip() + 
   labs(title="States with Highest ABV", 
-       subtitle="")
+       y="ABV")
 ggsave('Export/top_abv_summary.jpg')
 ```
 
@@ -432,8 +475,8 @@ beer_brewery %>%
 #top 10 states for having high ABV beers
 top_abv<-beer_brewery_byState %>% 
   arrange(desc(ABV_rating_high)) %>% 
+  rename_all(funs(str_replace_all(., "_", " "))) %>% 
   head(10)
-
 ```
 
 # Which state has highest variance in ABV?
@@ -443,11 +486,13 @@ top_abv<-beer_brewery_byState %>%
 #top 10 states with the most variance in ABV
 top_abv_sd<-beer_brewery_byState %>% 
   arrange(desc(ABV_sd)) %>% 
+  rename_all(funs(str_replace_all(., "_", " "))) %>% 
   head(10)
 
 #top 10 states with the least variance in ABV
 bottom_abv_sd<-beer_brewery_byState %>% 
   arrange(ABV_sd) %>% 
+  rename_all(funs(str_replace_all(., "_", " "))) %>% 
   head(10)
 ```
 
@@ -458,11 +503,13 @@ bottom_abv_sd<-beer_brewery_byState %>%
 #top 10 states with the most variance in ABV
 top_abv_sd<-beer_brewery_byState %>% 
   arrange(desc(ABV_sd)) %>% 
+  rename_all(funs(str_replace_all(., "_", " "))) %>% 
   head(10)
 
 #top 10 states with the least variance in ABV
 bottom_abv_sd<-beer_brewery_byState %>% 
   arrange(ABV_sd) %>% 
+  rename_all(funs(str_replace_all(., "_", " "))) %>% 
   head(10)
 ```
 
@@ -470,16 +517,19 @@ bottom_abv_sd<-beer_brewery_byState %>%
 #top 10 states for having high IBU beers
 top_ibu<-beer_brewery_byState %>% 
   arrange(desc(IBU_rating_high)) %>% 
+  rename_all(funs(str_replace_all(., "_", " "))) %>% 
   head(10)
 
 #top 10 states with the most variance in IBU
 top_ibu_sd<-beer_brewery_byState %>% 
   arrange(desc(IBU_sd)) %>% 
+  rename_all(funs(str_replace_all(., "_", " "))) %>% 
   head(10)
 
 #top 10 states with the least variance in IBU
 bottom_ibu_sd<-beer_brewery_byState %>% 
   arrange(IBU_sd) %>% 
+  rename_all(funs(str_replace_all(., "_", " "))) %>% 
   head(10)
 ```
 
