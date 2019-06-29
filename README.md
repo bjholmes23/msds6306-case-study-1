@@ -1,5 +1,5 @@
 # Market Analysis for Anheuser-Busch
-## This project is a simple market analysis of the breweries in the United States. We were given two comma separated value data sets that contained the name and addresses of breweries and the associated beers produced by each of these brewers. We analyzed the locations of brewers, beer styles, and geo-population-brewer relationships and generated a powerpoint presentation representing this analysis.This project produced some interesting results in alcohol content, bitterness, and population exposure for the crafted beer market.
+## This project is a simple market analysis of the breweries in the United States. The analysis was done on raw data consisting of two comma separated value data sets containing the name and addresses of breweries and the associated beers produced by each of these brewers. We analyzed the locations of brewers, beer styles, and geo-population-brewer relationships and generated a powerpoint presentation representing this analysis.This project produced some interesting results in alcohol content, bitterness, and population exposure for the crafted beer market.
 
 [![R Version][R-image]][r-url]
 [![Build Status][image]][travis-url]
@@ -19,7 +19,7 @@
     * State with maximum bitterness (IBU) beer
 
 
-![](holmes_schwan_header.jpg)
+![](Visuals/holmes_schwan_header.jpg)
 
 ## Installation
 
