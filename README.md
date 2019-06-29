@@ -58,6 +58,17 @@ install.packages(grid)
 install.packages(gridExtra)
 ```
 
+## Codebook 
+library(dataMaid)
+
+The raw Data provided by Anheuser-Busch can be found in the `Data` directory.
+
+2018 State population data was provided by the U.S. Census from the following API `https://api.census.gov/data/2018/pep/population?get=POP,GEONAME&for=state` 
+
+The State area data was provided by Wikipedia `https://en.wikipedia.org/wiki/List_of_U.S._states_and_territories_by_area` 
+
+The bulk of the analysis is represented in the `beer_brewery_byState` data.frame. This data has summarized by state. The codebook can be viewed in the [codebook_beer_brewery_byState.pdf]("./codebook_beer_brewery_byState.pdf"). 
+
 ## Release History
 
 * 0.2.1

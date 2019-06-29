@@ -664,3 +664,52 @@ print(my_pres, target = paste("anheuser-budwieser", extension, "v1.pptx", sep=''
 
 ```
 
+
+
+```{r Generate Codebook, echo=TRUE}
+attr(beer_brewery_byState$State, "label") <-"State Name abbreviation"                          
+attr(beer_brewery_byState$IBU_rating_low, "label") <-"Beers with a low International Bitterness Units Scale (IBU)"                
+attr(beer_brewery_byState$IBU_rating_medium, "label") <-"Beers with a medium International Bitterness Units Scale (IBU)"              
+attr(beer_brewery_byState$IBU_rating_high, "label") <-"Beers with a high International Bitterness Units Scale (IBU)"               
+attr(beer_brewery_byState$ABV_rating_low, "label") <-"Beers with a low Alcohol by Volume (ABV) value"               
+attr(beer_brewery_byState$ABV_rating_medium, "label") <-"Beers with a medium Alcohol by Volume (ABV) value"             
+attr(beer_brewery_byState$ABV_rating_high, "label") <-"Beers with a high Alcohol by Volume (ABV) value"                
+attr(beer_brewery_byState$Ounces_8.4, "label") <-"8.4 ounce beers"                    
+attr(beer_brewery_byState$Ounces_12, "label") <-"12 ounce beers"                      
+attr(beer_brewery_byState$Ounces_16, "label") <-"16 ounce beers"                    
+attr(beer_brewery_byState$Ounces_16.9, "label") <-"16.9 ounce beers"                    
+attr(beer_brewery_byState$Ounces_19.2, "label") <-"19.2 ounce beers"                
+attr(beer_brewery_byState$Ounces_24, "label") <-"24 ounce beers"                      
+attr(beer_brewery_byState$Ounces_32, "label") <-"32 ounce beers"                     
+attr(beer_brewery_byState$Number_of_beers, "label") <-"Number of beers"                
+attr(beer_brewery_byState$Number_of_breweries, "label") <-"Number of breweries"           
+attr(beer_brewery_byState$Number_of_styles, "label") <-"Number of beer styles"               
+attr(beer_brewery_byState$IBU_count, "label") <-"Number of beers with an IBU value"                     
+attr(beer_brewery_byState$IBU_average, "label") <-"Average IBU"                    
+attr(beer_brewery_byState$IBU_median, "label") <-"Median IBU"        
+attr(beer_brewery_byState$IBU_sd, "label") <-"Standard Deviation of IBU"                         
+attr(beer_brewery_byState$ABV_count, "label") <-"Number of beers with an ABV value"                     
+attr(beer_brewery_byState$ABV_average, "label") <-"Average ABV"                    
+attr(beer_brewery_byState$ABV_median, "label") <-"Median ABV"                    
+attr(beer_brewery_byState$ABV_sd, "label") <-"Standard deviation of ABV"                         
+attr(beer_brewery_byState$Ounces_count, "label") <-"Number of beers with an Ounces value"                  
+attr(beer_brewery_byState$Ounces_average, "label") <-"Average ounces"                 
+attr(beer_brewery_byState$Ounces_median, "label") <-"Median ounces"                 
+attr(beer_brewery_byState$Ounces_sd, "label") <-"Standard deviation of ounces"                      
+attr(beer_brewery_byState$Population, "label") <-"The number of people living in the state(2018 Census estimate)"                    
+attr(beer_brewery_byState$State_name, "label") <-"name of State"                     
+attr(beer_brewery_byState$breweries_per_million_person, "label") <-"Breweries per million people"  
+attr(beer_brewery_byState$Square_miles, "label") <-"Square miles of the state"                   
+attr(beer_brewery_byState$breweries_per_thousand_sqmiles, "label") <-"Breweries per thousand square miles"
+attr(beer_brewery_byState$ABV_rank, "label") <-"The ranking of ABV median against other states(e.g. #1 has the highest ABV)"                       
+attr(beer_brewery_byState$ABV_sd_rank, "label") <-"The ranking of ABV standard deviation against other states(e.g. #1 has the highest standard deviation)"      
+attr(beer_brewery_byState$IBU_rank, "label") <-"The ranking of IBU median against other states(e.g. #1 has the highest IBU)"                       
+attr(beer_brewery_byState$IBU_sd_rank, "label") <-"The ranking of IBU standard deviation against other states(e.g. #1 has the highest standard deviation)"      
+attr(beer_brewery_byState$Ounce_rank, "label") <-"The ranking of Ounce median against other states(e.g. #1 has the highest Ounce)"                        
+attr(beer_brewery_byState$Ounce_sd, "label") <-"The ranking of Ounce standard deviation against other states(e.g. #1 has the highest standard deviation)"                  
+
+makeCodebook(beer_brewery_byState)
+
+
+```
+
