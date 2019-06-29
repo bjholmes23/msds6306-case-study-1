@@ -65,17 +65,6 @@ missing_info <- paste('  ABV >', percent_missing$ABV, '  IBU >', percent_missing
 #hmm what should be done about the missing values...
 ```
 
-```{r exploratory brewery data aggregation by state, echo=TRUE}
-
-glimpse(breweryData)
-summary(breweryData)
-#    Brew_ID          Name               City              State          
-
-#Report the number of NA's in each column.
-breweryData %>% 
-  summarise_all(funs(sum(is.na(.))))#count the number of NAs or blanks
-#no missing values 
-```
 
 ```{r get population data, echo=TRUE}
 
@@ -117,7 +106,7 @@ statearea<- area_url %>%
   
 ```
 
-#How many breweries in each state
+#1. How many breweries in each state
 
 ```{r how many breweries in each state, echo=TRUE}
 brewstate<-breweryData %>% 
@@ -129,7 +118,7 @@ top_brewstate <- head(brewstate,5)
 bottom_brewstate <- tail(brewstate,5)
 
 ```
-# Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
+#2. Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
 
 ```{r merge data, echo=TRUE}
 
@@ -140,6 +129,15 @@ beer_brewery<-beerData %>%
   mutate(ABV_rating= cut_number(ABV, n = 3,labels=c("low","medium","high"))) %>% 
   mutate(IBU_rating= cut_number(IBU, n = 3,labels=c("low","medium","high"))) 
   
+```
+
+
+
+```{r looking for bad data, echo=FALSE}
+
+glimpse(beer_brewery)
+summary(beer_brewery)
+
 beer_brewery %>% 
   filter(is.na(Brewery_name)) 
 #returns no results so all beers have a brewery
@@ -149,11 +147,6 @@ first_combo_brewery<-head(beer_brewery,6)
 last_combo_brewery<-tail(beer_brewery,6)
 
 
-```
-
-
-
-```{r looking for bad data, echo=FALSE}
 #looking for duplicated data in character vectors
 lookForDupStrings <- function(string_arr){
   library(tidystringdist)
@@ -179,7 +172,17 @@ lookForDupStrings(beer_brewery$Brewery_name)
 # 2      63 Against The Grain Brewery     Louisville KY   
 ```
 
-# Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
+#3. Report the number of NA's in each column
+```{r exploratory brewery data aggregation by state, echo=TRUE}
+
+#    Brew_ID          Name               City              State          
+
+#Report the number of NA's in each column.
+beer_brewery %>% 
+  summarise_all(funs(sum(is.na(.))))#count the number of NAs or blanks
+#no missing values 
+```
+
 ```{r Aggregations by State, echo=TRUE}
 
 #Summary data by State 
@@ -277,6 +280,13 @@ general_statistics<-grid.arrange(
     state_base + geom_polygon(data = map_data, aes(fill = Population/1000000))  + labs(fill = "Population (millions)") + scale_fill_viridis(option="D"),
     ncol=3, nrow=2
 )
+```
+
+# 4. Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
+
+We elected to use heat maps instead of bar charts because they provided more insights.
+
+```{r ABV/IBU by state, ECHO=TRUE}
 ggsave('Export/brewers_ratings.jpg')
 #ABV data mapped 
 grid.arrange(
@@ -334,6 +344,8 @@ ggsave('Export/ibu_SD_data.jpg')
 ```
 
 
+#5. Which state has the maximum alcoholic (ABV) beer? Which state has the most bitter (IBU) beer?
+
 ```{r IBU Plots, echo=TRUE}
 #top 10 states for having high IBU beers
 top_ibu<-beer_brewery_byState %>% 
@@ -388,6 +400,7 @@ beer_brewery_byState %>%
 ggsave('Export/top_abv_summary.jpg')
 ```
 
+#7. Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot.
 ```{r relationship between IBU and ABV, echo=TRUE}
 #BASIC POSITIVE CORRELATION 
 
@@ -498,7 +511,7 @@ ggsave('Export/IBU_by_volume.jpg')
 
 ```
 
-#Summary statistics for the ABV variable.
+#6. Summary statistics for the ABV variable.
 
 ```{r summary statistics for the ABV variable, echo=TRUE}
 
