@@ -2,7 +2,7 @@
 ## This project is a simple market analysis of the breweries in the United States. The analysis was done on raw data consisting of two comma separated value data sets containing the name and addresses of breweries and the associated beers produced by each of these brewers. We analyzed the locations of brewers, beer styles, and geo-population-brewer relationships and generated a powerpoint presentation representing this analysis.This project produced some interesting results in alcohol content, bitterness, and population exposure for the crafted beer market.
 
 [![R Version][R-image]][r-url]
-[![Build Status][image]][travis-url]
+
 [![Downloads Stats][github-downloads]][git-url]
 
 ### The application below imports the two comma seperated value files. We use R language to perform the following analysis:
@@ -71,19 +71,7 @@ The bulk of the analysis is represented in the `beer_brewery_byState` data.frame
 
 ## Release History
 
-* 0.2.1
-    * CHANGE: Update docs (module code remains unchanged)
-* 0.2.0
-    * CHANGE: Remove `setDefaultXYZ()`
-    * ADD: Add `init()`
-* 0.1.1
-    * FIX: Crash when calling `baz()` (Thanks @GenerousContributorName!)
-* 0.1.0
-    * The first proper release
-    * CHANGE: Rename `foo()` to `bar()`
-* 0.0.1
-    * Work in progress
-
+*
 ## Meta
 
 Mel Schwan – [@mobilewings](https://twitter.com/mobilewings) – mschwan@smu.edu
